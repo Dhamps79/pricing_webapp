@@ -7,11 +7,98 @@ from urllib.parse import urlparse
 
 import httpx
 from bs4 import BeautifulSoup
+from datetime import datetime
 
+from sqlalchemy.orm import Session
 
+from app.repos.price_history_repo import (
+    get_latest_price,
+    get_price_history,
+)
+from app.repos.product_repo import get_product_by_id
+
+from app.repos.product_repo import (
+    create_product,
+    get_product_by_name,
+)
+from app.repos.source_repo import (
+    create_source,
+    get_source_by_url,
+)
+from app.repos.price_history_repo import (
+    create_price_history,
+)
 USER_AGENT = "LiveSpreadsheetPriceReader/0.1 (+local-development)"
 TIMEOUT = httpx.Timeout(10.0, connect=5.0)
+async def track_price(
+    db: Session,
+    url: str,
+):
+    data = await lookup_price(url)
 
+    try:
+        # 1. Find or create Product
+        product = get_product_by_name(
+            db,
+            data["product_name"],
+        )
+
+        if product is None:
+            product = create_product(
+                db=db,
+                name=data["product_name"],
+                image_url=data["image_url"],
+            )
+
+        # 2. Find or create Source
+        source = get_source_by_url(
+            db,
+            data["source_url"],
+        )
+
+        if source is None:
+            parsed = urlparse(data["source_url"])
+
+            source = create_source(
+                db=db,
+                product_id=product.id,
+                url=data["source_url"],
+                domain=parsed.hostname or "",
+                source_type=data["source_type"],
+            )
+
+        # 3. Create price history record
+        fetched_at = datetime.fromisoformat(
+            data["fetched_at"]
+        )
+
+        history = create_price_history(
+            db=db,
+            product_id=product.id,
+            source_id=source.id,
+            price=data["price"],
+            currency=data["currency"],
+            availability=data["availability"],
+            fetched_at=fetched_at,
+        )
+
+        # 4. Commit everything as one transaction
+        db.commit()
+
+        # Refresh objects from PostgreSQL
+        db.refresh(product)
+        db.refresh(source)
+        db.refresh(history)
+
+        return {
+            "product": product,
+            "source": source,
+            "price_history": history,
+        }
+
+    except Exception:
+        db.rollback()
+        raise
 
 def _validate_target(url: str) -> None:
     parsed = urlparse(url)
@@ -109,4 +196,51 @@ async def lookup_price(url: str):
         "image_url": image,
         "fetched_at": datetime.now(timezone.utc).isoformat(),
         "source_type": "json-ld",
+    }
+
+def get_current_price(
+    db: Session,
+    product_id: int,
+):
+    product = get_product_by_id(
+        db,
+        product_id,
+    )
+
+    if product is None:
+        return None
+
+    latest = get_latest_price(
+        db,
+        product_id,
+    )
+
+    if latest is None:
+        return None
+
+    return {
+        "product": product,
+        "price": latest,
+    }
+
+def get_product_price_history(
+    db: Session,
+    product_id: int,
+):
+    product = get_product_by_id(
+        db,
+        product_id,
+    )
+
+    if product is None:
+        return None
+
+    history = get_price_history(
+        db,
+        product_id,
+    )
+
+    return {
+        "product": product,
+        "history": history,
     }

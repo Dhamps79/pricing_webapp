@@ -4,10 +4,24 @@ from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
+from typing import TYPE_CHECKING
 
+from sqlalchemy.orm import relationship
+
+if TYPE_CHECKING:
+    from app.database.models.product import Product
+    from app.database.models.price_history import PriceHistory
 
 class Source(Base):
     __tablename__ = "sources"
+    product: Mapped["Product"] = relationship(
+        back_populates="sources",
+    )
+
+    price_history: Mapped[list["PriceHistory"]] = relationship(
+       back_populates="source",
+       cascade="all, delete-orphan",
+    )
 
     id: Mapped[int] = mapped_column(
         primary_key=True,

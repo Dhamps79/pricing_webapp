@@ -8,6 +8,13 @@ from sqlalchemy import (
     String,
 )
 from sqlalchemy.orm import Mapped, mapped_column
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import relationship
+
+if TYPE_CHECKING:
+    from app.database.models.product import Product
+    from app.database.models.source import Source
 
 from app.database.base import Base
 
@@ -50,4 +57,11 @@ class PriceHistory(Base):
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
+    )
+    product: Mapped["Product"] = relationship(
+        back_populates="price_history",
+    )
+
+    source: Mapped["Source"] = relationship(
+        back_populates="price_history",
     )
