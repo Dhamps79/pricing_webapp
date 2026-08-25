@@ -1,0 +1,402 @@
+[
+  {
+    "page": 5,
+    "sku": "3RH2140-1B..08K",
+    "price": 4815.0,
+    "line": "4 \u2212 n 3RH2140-1A..08K 3470.- 1 n 3RH2140-1B..08K 4815.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2131-1B..08K",
+    "price": 4815.0,
+    "line": "S00 10 3 1 n 3RH2131-1A..08K 3470.- 1 n 3RH2131-1B..08K 4815.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2122-1B..08K",
+    "price": 4815.0,
+    "line": "2 2 n 3RH2122-1A..08K 3470.- 1 n 3RH2122-1B..08K 4815.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2440-1B..0",
+    "price": 16875.0,
+    "line": "4 \u2212 3RH2440-1A..0 12695.- 1 3RH2440-1B..0 16875.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2431-1B..0",
+    "price": 16875.0,
+    "line": "10 3 1 3RH2431-1A..0 12695.- 1 3RH2431-1B..0 16875.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2422-1B..0",
+    "price": 16875.0,
+    "line": "2 2 3RH2422-1A..0 12695.- 1 3RH2422-1B..0 16875.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2140-1KB40",
+    "price": 6195.0,
+    "line": "4 - 3RH2140-1KB40 6195.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2131-1KB40",
+    "price": 6195.0,
+    "line": "S00 Built in Suppressor Diode 10 3 1 3RH2131-1KB40 6195.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2122-1KB40",
+    "price": 6195.0,
+    "line": "2 2 3RH2122-1KB40 6195.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2140-1SB40",
+    "price": 8830.0,
+    "line": "4 - 3RH2140-1SB40 8830.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2131-1SB40",
+    "price": 8830.0,
+    "line": "S00 Built in Suppressor Diode 10 3 1 3RH2131-1SB40 8830.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 5,
+    "sku": "3RH2122-1SB40",
+    "price": 8830.0,
+    "line": "2 2 3RH2122-1SB40 8830.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2015-1B..18K",
+    "price": 4380.0,
+    "line": "1NO n 3RT2015-1A..18K 2820.- 1 n 3RT2015-1B..18K 4380.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2015-1B..28K",
+    "price": 4380.0,
+    "line": "1NC n 3RT2015-1A..28K 2820.- 1 n 3RT2015-1B..28K 4380.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2016-1B..18K",
+    "price": 4765.0,
+    "line": "1NO n 3RT2016-1A..18K 2970.- 1 n 3RT2016-1B..18K 4765.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2016-1B..28K",
+    "price": 4765.0,
+    "line": "1NC n 3RT2016-1A..28K 2970.- 1 n 3RT2016-1B..28K 4765.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2017-1B..18K",
+    "price": 5515.0,
+    "line": "1NO n 3RT2017-1A..18K 3340.- 1 n 3RT2017-1B..18K 5515.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2017-1B..28K",
+    "price": 5515.0,
+    "line": "1NC n 3RT2017-1A..28K 3340.- 1 n 3RT2017-1B..28K 5515.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2018-1B..18K",
+    "price": 6490.0,
+    "line": "1NO n 3RT2018-1A..18K 3965.- 1 n 3RT2018-1B..18K 6490.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2018-1B..28K",
+    "price": 6490.0,
+    "line": "1NC n 3RT2018-1A..28K 3965.- 1 n 3RT2018-1B..28K 6490.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2026-1B..08K",
+    "price": 10200.0,
+    "line": "25 11 1NO+1NC n 3RT2026-1A..08K 5880.- 1 n 3RT2026-1B..08K 10200.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2027-1B..08K",
+    "price": 20745.0,
+    "line": "32 15 1NO+1NC n 3RT2027-1A..08K 11470.- 1 n 3RT2027-1B..08K 20745.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2028-1B..08K",
+    "price": 24650.0,
+    "line": "38 18.5 1NO+1NC n 3RT2028-1A..08K 16415.- 1 n 3RT2028-1B..08K 24650.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2028-1B..08KA0",
+    "price": 25830.0,
+    "line": "40 18.5 1NO+1NC n 3RT2028-1A..08KA0# 17300.- 1 n 3RT2028-1B..08KA0# 25830.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2036-1N..08K",
+    "price": 36425.0,
+    "line": "50 22 1NO+1NC n 3RT2036-1A..08K 22695.- 1 n 3RT2036-1N..08K 36425.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2037-1N..08K",
+    "price": 41255.0,
+    "line": "S2 65 30 1NO+1NC n 3RT2037-1A..08K 31525.- 1 n 3RT2037-1N..08K 41255.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2038-1N..08K",
+    "price": 50255.0,
+    "line": "80 37 1NO+1NC n 3RT2038-1A..08K 39220.- 1 n 3RT2038-1N..08K 50255.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2046-1N..08K",
+    "price": 62425.0,
+    "line": "95 45 1NO+1NC n 3RT2046-1A..08K 49755.- 1 n 3RT2046-1N..08K 62425.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT2047-1N..08K",
+    "price": 80765.0,
+    "line": "110 55 1NO+1NC n 3RT2047-1A..08K 63615.- 1 n 3RT2047-1N..08K 80765.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1054-6A.368K",
+    "price": 64525.0,
+    "line": "115 55 \u2013 n 3RT1054-6C.308K 61580.- 1 2NO+2NC n 3RT1054-6A.368K 64525.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1055-6A.368K",
+    "price": 81330.0,
+    "line": "S6 150 75 \u2013 n 3RT1055-6C.308K 77340.- 1 2NO+2NC n 3RT1055-6A.368K 81330.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1056-6A.368K",
+    "price": 101750.0,
+    "line": "185 90 \u2013 n 3RT1056-6C.308K 97975.- 1 2NO+2NC n 3RT1056-6A.368K 101750.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1064-6A.368K",
+    "price": 107490.0,
+    "line": "225 110 \u2013 n 3RT1064-6C.308K 104505.- 1 2NO+2NC n 3RT1064-6A.368K 107490.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1065-6A.368K",
+    "price": 130805.0,
+    "line": "S10 265 132 \u2013 n 3RT1065-6C.308K 127775.- 1 2NO+2NC n 3RT1065-6A.368K 130805.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1066-6A.368K",
+    "price": 157025.0,
+    "line": "300 160 \u2013 n 3RT1066-6C.308K 152665.- 1 2NO+2NC n 3RT1066-6A.368K 157025.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1075-6A.368K",
+    "price": 188670.0,
+    "line": "400 200 \u2013 n 3RT1075-6C.308K 183450.- 1 2NO+2NC n 3RT1075-6A.368K 188670.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT1076-6A.368K",
+    "price": 261190.0,
+    "line": "500 250 \u2013 n 3RT1076-6C.308K 256350.- 1 2NO+2NC n 3RT1076-6A.368K 261190.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 6,
+    "sku": "3RT203.-.N",
+    "price": 204.0,
+    "line": "Contactor Type 3RT203.-.N 3RT204.-.N Contactor Type 3RT1_Conventional Coil",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1054-6LA068K",
+    "price": 50590.0,
+    "line": "115 55 \u2013 n 3RT1054-6LA008K 47695.- 1 2NO+2NC n 3RT1054-6LA068K 50590.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1055-6LA068K",
+    "price": 67570.0,
+    "line": "S6 150 75 \u2013 n 3RT1055-6LA008K 65215.- 1 2NO+2NC n 3RT1055-6LA068K 67570.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1056-6LA068K",
+    "price": 88055.0,
+    "line": "185 90 \u2013 n 3RT1056-6LA008K 84815.- 1 2NO+2NC n 3RT1056-6LA068K 88055.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1064-6LA068K",
+    "price": 90590.0,
+    "line": "225 110 \u2013 n 3RT1064-6LA008K 87230.- 1 2NO+2NC n 3RT1064-6LA068K 90590.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1065-6LA068K",
+    "price": 112850.0,
+    "line": "S10 265 132 \u2013 n 3RT1065-6LA008K 109720.- 1 2NO+2NC n 3RT1065-6LA068K 112850.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1066-6LA068K",
+    "price": 138305.0,
+    "line": "300 160 \u2013 n 3RT1066-6LA008K 134450.- 1 2NO+2NC n 3RT1066-6LA068K 138305.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1075-6LA068K",
+    "price": 156820.0,
+    "line": "400 200 \u2013 n 3RT1075-6LA008K 152470.- 1 2NO+2NC n 3RT1075-6LA068K 156820.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RT1076-6LA068K",
+    "price": 228480.0,
+    "line": "500 250 \u2013 n 3RT1076-6LA008K 224250.- 1 2NO+2NC n 3RT1076-6LA068K 228480.- 1",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RH1921-1CA10",
+    "price": 515.0,
+    "line": "1 \u2013 \u2013 \u2013 3RH1921-1CA10 515.- 10",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RH1921-1CA01",
+    "price": 515.0,
+    "line": "\u2013 1 \u2013 \u2013 3RH1921-1CA01 515.- 10",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RH1921-1CD10",
+    "price": 1000.0,
+    "line": "\u2013 \u2013 1 \u2013 3RH1921-1CD10 1000.- 10",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3RH1921-1CD01",
+    "price": 1000.0,
+    "line": "\u2013 \u2013 \u2013 1 3RH1921-1CD01 1000.- 10",
+    "family": "SIRIUS Modular System - The Perfect Combination UL",
+    "group": null
+  }
+]

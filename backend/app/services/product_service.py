@@ -12,7 +12,9 @@ def list_products(db: Session):
     # Get all products
     # ---------------------------------------------------------
     products = db.scalars(
-        select(Product).order_by(Product.id.desc())
+        select(Product)
+        .where(Product.sku.is_(None))
+        .order_by(Product.id.desc())
     ).all()
 
     if not products:

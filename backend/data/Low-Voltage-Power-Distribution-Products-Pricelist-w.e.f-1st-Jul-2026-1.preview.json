@@ -1,0 +1,402 @@
+[
+  {
+    "page": 7,
+    "sku": "3WA1350-5AF42-0AA0",
+    "price": 4901095.0,
+    "line": "MDO 3WA1350-5AF32-0AA0 3887375.- 3WA1350-5AF42-0AA0 4901095.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3WA1350-5AF42-4EA4",
+    "price": 5143600.0,
+    "line": "EDO 3WA1350-5AF32-4EA4 4129880.- 3WA1350-5AF42-4EA4 5143600.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3WA1363-5AF41-0AA0",
+    "price": 6487710.0,
+    "line": "MDO 3WA1363-5AF31-0AA0 5186390.- 3WA1363-5AF41-0AA0 6487710.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 7,
+    "sku": "3WA1363-5AF41-4EA4",
+    "price": 6730215.0,
+    "line": "EDO 3WA1363-5AF31-4EA4 5428895.- 3WA1363-5AF41-4EA4 6730215.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AD02",
+    "price": 38600.0,
+    "line": "Shunt Release or Closing Coil \u2013 24-30 3WA9111-0AD02 38600.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AD05",
+    "price": 38600.0,
+    "line": "Suitable for continuous operation 110-127 110-125 3WA9111-0AD05 38600.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AD06",
+    "price": 38600.0,
+    "line": "208-240 220-250 3WA9111-0AD06 38600.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AE07",
+    "price": 42665.0,
+    "line": "Under Voltage Release (Instantaneous) 380-415 \u2013 3WA9111-0AE07 42665.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AF02",
+    "price": 213390.0,
+    "line": "Motorised Operating Mechanism \u2013 24-30 3WA9111-0AF02 213390.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AF05",
+    "price": 213390.0,
+    "line": "110-127 110-125 3WA9111-0AF05 213390.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 8,
+    "sku": "3WA9111-0AF06",
+    "price": 213390.0,
+    "line": "208-240 220-250 3WA9111-0AF06 213390.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WX3663",
+    "price": 10880.0,
+    "line": "Castell Lock 3WX3663-6JEL_# 10880.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8065-6AA04-5AB2",
+    "price": 794100.0,
+    "line": "MDO 3WT8061-6AA04-5AB2 610835.- 3WT8065-6AA04-5AB2 794100.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8065-6UA34-5AB2",
+    "price": 973375.0,
+    "line": "EDO 3WT8061-6UA34-5AB2 790110.- 3WT8065-6UA34-5AB2 973375.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8085-6AA04-5AB2",
+    "price": 843890.0,
+    "line": "MDO 3WT8081-6AA04-5AB2 644665.- 3WT8085-6AA04-5AB2 843890.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8085-6UA34-5AB2",
+    "price": 1023165.0,
+    "line": "EDO 3WT8081-6UA34-5AB2 823940.- 3WT8085-6UA34-5AB2 1023165.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8105-6AA04-5AB2",
+    "price": 858900.0,
+    "line": "MDO 3WT8101-6AA04-5AB2 662160.- 3WT8105-6AA04-5AB2 858900.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8105-6UA34-5AB2",
+    "price": 1038175.0,
+    "line": "EDO 3WT8101-6UA34-5AB2 841435.- 3WT8105-6UA34-5AB2 1038175.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8125-6AA04-5AB2",
+    "price": 966890.0,
+    "line": "MDO 3WT8121-6AA04-5AB2 813325.- 3WT8125-6AA04-5AB2 966890.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8125-6UA34-5AB2",
+    "price": 1146165.0,
+    "line": "EDO 3WT8121-6UA34-5AB2 992600.- 3WT8125-6UA34-5AB2 1146165.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8165-6AA04-5AB2",
+    "price": 1056685.0,
+    "line": "MDO 3WT8161-6AA04-5AB2 872920.- 3WT8165-6AA04-5AB2 1056685.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8165-6UA34-5AB2",
+    "price": 1235960.0,
+    "line": "EDO 3WT8161-6UA34-5AB2 1052195.- 3WT8165-6UA34-5AB2 1235960.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8206-6AA04-5AB2",
+    "price": 1349825.0,
+    "line": "MDO 3WT8202-6AA04-5AB2 1096750.- 3WT8206-6AA04-5AB2 1349825.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8206-6UA34-5AB2",
+    "price": 1529100.0,
+    "line": "EDO 3WT8202-6UA34-5AB2 1276025.- 3WT8206-6UA34-5AB2 1529100.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8256-6AA04-5AB2",
+    "price": 1579385.0,
+    "line": "MDO 3WT8252-6AA04-5AB2 1242295.- 3WT8256-6AA04-5AB2 1579385.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8256-6UA34-5AB2",
+    "price": 1758660.0,
+    "line": "EDO 3WT8252-6UA34-5AB2 1421570.- 3WT8256-6UA34-5AB2 1758660.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8326-6AA04-5AB2",
+    "price": 1954250.0,
+    "line": "MDO 3WT8322-6AA04-5AB2 1592700.- 3WT8326-6AA04-5AB2 1954250.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8326-6UA34-5AB2",
+    "price": 2133525.0,
+    "line": "EDO 3WT8322-6UA34-5AB2 1771975.- 3WT8326-6UA34-5AB2 2133525.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8065-6AA00-0AA2",
+    "price": 607310.0,
+    "line": "MF 3WT8061-6AA00-0AA2 448885.- 3WT8065-6AA00-0AA2 607310.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8065-6UA30-0AA2",
+    "price": 786585.0,
+    "line": "EF 3WT8061-6UA30-0AA2 628160.- 3WT8065-6UA30-0AA2 786585.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8085-6AA00-0AA2",
+    "price": 666685.0,
+    "line": "MF 3WT8081-6AA00-0AA2 484530.- 3WT8085-6AA00-0AA2 666685.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8085-6UA30-0AA2",
+    "price": 845960.0,
+    "line": "EF 3WT8081-6UA30-0AA2 663805.- 3WT8085-6UA30-0AA2 845960.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8105-6AA00-0AA2",
+    "price": 706260.0,
+    "line": "MF 3WT8101-6AA00-0AA2 493945.- 3WT8105-6AA00-0AA2 706260.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8105-6UA30-0AA2",
+    "price": 885535.0,
+    "line": "EF 3WT8101-6UA30-0AA2 673220.- 3WT8105-6UA30-0AA2 885535.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8125-6AA00-0AA2",
+    "price": 794480.0,
+    "line": "MF 3WT8121-6AA00-0AA2 671855.- 3WT8125-6AA00-0AA2 794480.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8125-6UA30-0AA2",
+    "price": 973755.0,
+    "line": "EF 3WT8121-6UA30-0AA2 851130.- 3WT8125-6UA30-0AA2 973755.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8165-6AA00-0AA2",
+    "price": 851015.0,
+    "line": "MF 3WT8161-6AA00-0AA2 685985.- 3WT8165-6AA00-0AA2 851015.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8165-6UA30-0AA2",
+    "price": 1030290.0,
+    "line": "EF 3WT8161-6UA30-0AA2 865260.- 3WT8165-6UA30-0AA2 1030290.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8206-6AA00-0AA2",
+    "price": 1107490.0,
+    "line": "MF 3WT8202-6AA00-0AA2 771490.- 3WT8206-6AA00-0AA2 1107490.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8206-6UA30-0AA2",
+    "price": 1286765.0,
+    "line": "EF 3WT8202-6UA30-0AA2 950765.- 3WT8206-6UA30-0AA2 1286765.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8256-6AA00-0AA2",
+    "price": 1300285.0,
+    "line": "MF 3WT8252-6AA00-0AA2 870840.- 3WT8256-6AA00-0AA2 1300285.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8256-6UA30-0AA2",
+    "price": 1479560.0,
+    "line": "EF 3WT8252-6UA30-0AA2 1050115.- 3WT8256-6UA30-0AA2 1479560.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8326-6AA00-0AA2",
+    "price": 1632950.0,
+    "line": "MF 3WT8322-6AA00-0AA2 1325920.- 3WT8326-6AA00-0AA2 1632950.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 11,
+    "sku": "3WT8326-6UA30-0AA2",
+    "price": 1812225.0,
+    "line": "EF 3WT8322-6UA30-0AA2 1505195.- 3WT8326-6UA30-0AA2 1812225.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9831-1JH00",
+    "price": 192370.0,
+    "line": "Motorized Operating Mechanism with 110-127 110-125 3WT9831-1JH00 192370.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9831-1JK00",
+    "price": 192370.0,
+    "line": "Electrical closing 220-240 220-250 3WT9831-1JK00 192370.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9851-1JB00",
+    "price": 16480.0,
+    "line": "Shunt Release or Closing Coil \u2013 24 3WT9851-1JB00 16480.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9851-1JH00",
+    "price": 16480.0,
+    "line": "Suitable for continuous operation 110-127 110-125 3WT9851-1JH00 16480.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9851-1JK00",
+    "price": 16480.0,
+    "line": "220-240 220-250 3WT9851-1JK00 16480.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  },
+  {
+    "page": 12,
+    "sku": "3WT9853-1JH00",
+    "price": 17110.0,
+    "line": "Under Voltage Release 110-127 110-125 3WT9853-1JH00 17110.-",
+    "family": "SENTRON - Safe.Flexible.Efficient",
+    "group": null
+  }
+]

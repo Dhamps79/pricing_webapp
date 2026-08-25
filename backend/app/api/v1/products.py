@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.sessions import get_db
 from app.database.models.product import Product
+from app.services.product_service import list_products
 
 router = APIRouter(
     prefix="/products",
@@ -14,13 +15,7 @@ router = APIRouter(
 def get_products(
     db: Session = Depends(get_db),
 ):
-    products = (
-        db.query(Product)
-        .order_by(Product.id.desc())
-        .all()
-    )
-
-    return products
+    return list_products(db)
 
 
 @router.delete("/{product_id}")
