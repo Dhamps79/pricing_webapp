@@ -134,11 +134,17 @@ async def refresh_product(
 
     product = result["product"]
 
-    # Re-run the existing tracking pipeline using
-    # the product's stored source URL.
+    if not product.sources:
+        raise HTTPException(
+            status_code=404,
+            detail="No source found for this product",
+        )
+
+    source = product.sources[0]
+
     tracked = await track_price(
         db=db,
-        url=product.source.url,
+        url=source.url,
     )
 
     return {

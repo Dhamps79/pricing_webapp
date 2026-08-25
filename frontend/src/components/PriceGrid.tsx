@@ -1,19 +1,21 @@
 import { useMemo } from "react";
-import { AgGridReact } from "ag-grid-react";
-
 import type { ColDef } from "ag-grid-community";
-
-import type { Product } from "../services/productApi";
+import { AgGridReact } from "ag-grid-react";
+import type { ProductRow } from "../types/price";
 
 
 interface PriceGridProps {
   rows: ProductRow[];
 
-  onRowsChange: (
-    rows: ProductRow[],
-  ) => void;
+onRowsChange: React.Dispatch<
+    React.SetStateAction<ProductRow[]>
+  >;
 
   onRefresh: (
+    productId: number,
+  ) => void;
+
+  onDelete: (
     productId: number,
   ) => void;
 }
@@ -22,117 +24,144 @@ export default function PriceGrid({
   rows,
   onRowsChange,
   onRefresh,
+  onDelete
 }: PriceGridProps) {
-  const columnDefs = useMemo<ColDef<Product>[]>(
-    () => [
-      {
-        field: "name",
-        headerName: "Product",
-        sortable: true,
-        filter: true,
-        flex: 2,
-      },
+  const columnDefs = useMemo<ColDef<ProductRow>[]>(
+  () => [
+    {
+      field: "name",
+      headerName: "Product",
+      flex: 2,
+      sortable: true,
+      filter: true,
+    },
 
-      {
-        field: "current_price",
-        headerName: "Current Price",
-        sortable: true,
-        filter: "agNumberColumnFilter",
-        valueFormatter: (params) => {
-          if (params.value == null) {
-            return "—";
-          }
+    {
+      field: "price",
+      headerName: "Price",
+      sortable: true,
+      filter: "agNumberColumnFilter",
+      valueFormatter: (params) =>
+        params.value != null
+          ? `₹${Number(params.value).toLocaleString("en-IN")}`
+          : "",
+    },
 
-          return `${params.value}`;
-        },
-      },
+    {
+      field: "currency",
+      headerName: "Currency",
+      width: 100,
+      sortable: true,
+      filter: true,
+    },
 
-      {
-        field: "previous_price",
-        headerName: "Previous Price",
-        sortable: true,
-        filter: "agNumberColumnFilter",
-      },
+    {
+      field: "availability",
+      headerName: "Availability",
+      flex: 1,
+      sortable: true,
+      filter: true,
+    },
 
-      {
-        field: "price_change",
-        headerName: "Change",
-        sortable: true,
-        filter: "agNumberColumnFilter",
-      },
+    {
+      field: "fetchedAt",
+      headerName: "Last Updated",
+      flex: 1.5,
+      sortable: true,
+      filter: true,
+    },
 
-      {
-        field: "price_change_percent",
-        headerName: "Change %",
-        sortable: true,
-        filter: "agNumberColumnFilter",
+    {
+      field: "trend",
+      headerName: "Trend",
+      width: 110,
+      sortable: true,
+      filter: true,
+    },
 
-        valueFormatter: (params) => {
-          if (params.value == null) {
-            return "—";
-          }
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      width: 110,
+      editable: true,
+      sortable: true,
+      filter: "agNumberColumnFilter",
+    },
 
-          return `${Number(params.value).toFixed(2)}%`;
-        },
-      },
+    {
+      field: "targetPrice",
+      headerName: "Target Price",
+      width: 130,
+      editable: true,
+      sortable: true,
+      filter: "agNumberColumnFilter",
+    },
 
-      {
-        field: "currency",
-        headerName: "Currency",
-        width: 100,
-      },
-
-      {
-        field: "availability",
-        headerName: "Availability",
-        sortable: true,
-        filter: true,
-      },
-
-      {
-        field: "source_domain",
-        headerName: "Source",
-        sortable: true,
-        filter: true,
-      },
-
-      {
-        field: "fetched_at",
-        headerName: "Last Updated",
-        sortable: true,
-        flex: 1,
-      },
-
-      {
-        field: "trend",
-        headerName: "Trend",
-        sortable: true,
-        filter: true,
-      },
-
-      {
-  headerName: "Actions",
-  width: 120,
-  sortable: false,
-  filter: false,
-
-  cellRenderer: (params: any) => {
-    const productId = params.data?.id;
-
-    return (
-      <button
-        onClick={() =>
-          onRefresh(productId)
-        }
-      >
-        Refresh
-      </button>
+    {
+      field: "notes",
+      headerName: "Notes",
+      flex: 1.5,
+      editable: true,
+      sortable: true,
+      filter: true,
+    },
+    {
+  headerName: "Total",
+  valueGetter: (params) => {
+    const price = Number(params.data?.price || 0);
+    const quantity = Number(
+      params.data?.quantity || 1,
     );
+
+    return price * quantity;
   },
-  },
-    ],
-    []
-  );
+},
+
+
+    {
+      headerName: "Actions",
+      width: 180,
+      sortable: false,
+      filter: false,
+
+      cellRenderer: (params: any) => {
+        const productId = params.data?.id;
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                if (productId) {
+                  onRefresh(productId);
+                }
+              }}
+            >
+              Refresh
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (productId) {
+                  onDelete(productId);
+                }
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        );
+      },
+    },
+  ],
+  [onRefresh, onDelete],
+);
 
   const defaultColDef = useMemo<ColDef>(
     () => ({
@@ -151,7 +180,7 @@ export default function PriceGrid({
         height: "600px",
       }}
     >
-      <AgGridReact<Product>
+      <AgGridReact<ProductRow>
         rowData={rows}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
@@ -173,4 +202,6 @@ export default function PriceGrid({
       />
     </div>
   );
+
+  
 }

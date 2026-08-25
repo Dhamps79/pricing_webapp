@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import PriceGrid from "./components/PriceGrid.tsx";
 import type { ProductRow } from "./types/price";
 import { trackPrice } from "./api/prices.ts";
-
 import {
   getProducts,
-  refreshProduct,
-  type Product,
+  deleteProduct,
 } from "./services/productApi";
 
 function App() {
   const [rows, setRows] = useState<ProductRow[]>([]);
   const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [tracking, setTracking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /*
-   * Load existing products from PostgreSQL
-   * when the application starts.
-   */
+  // --------------------------------------------------
+  // LOAD PRODUCTS FROM POSTGRESQL
+  // --------------------------------------------------
+
   useEffect(() => {
     async function loadProducts() {
       try {
@@ -27,38 +26,10 @@ function App() {
 
         const products = await getProducts();
 
-        /*
-         * Convert backend Product objects into
-         * the row structure expected by AG Grid.
-         */
-        const productRows: ProductRow[] = products.map(
-          (product: Product) => ({
-            id: product.id,
-            name: product.name,
-            imageUrl: product.image_url,
-
-            price: Number(product.current_price ?? 0),
-            currency: product.currency ?? "INR",
-
-            availability:
-              product.availability ?? "Unknown",
-
-            sourceUrl: product.source_url ?? "",
-            sourceDomain:
-              product.source_domain ?? "",
-
-            fetchedAt: product.fetched_at ?? "",
-
-            trend: product.trend,
-
-            quantity: 1,
-            targetPrice: null,
-            notes: "",
-          }),
-        );
-
-        setRows(productRows);
+        setRows(products);
       } catch (err) {
+        console.error(err);
+
         setError(
           err instanceof Error
             ? err.message
@@ -72,37 +43,32 @@ function App() {
     loadProducts();
   }, []);
 
-  /*
-   * Track a new product from a URL.
-   */
+  // --------------------------------------------------
+  // ADD / TRACK PRODUCT
+  // --------------------------------------------------
+
   async function handleTrack() {
     if (!url.trim()) {
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
+      setTracking(true);
+      setError(null);
+
       const result = await trackPrice(url);
 
       const row: ProductRow = {
         id: result.product.id,
         name: result.product.name,
         imageUrl: result.product.image_url,
-
         price: Number(result.price.value),
         currency: result.price.currency,
-
         availability: result.price.availability,
-
         sourceUrl: result.source.url,
         sourceDomain: result.source.domain,
-
         fetchedAt: result.price.fetched_at,
-
         trend: "stable",
-
         quantity: 1,
         targetPrice: null,
         notes: "",
@@ -124,42 +90,45 @@ function App() {
 
       setUrl("");
     } catch (err) {
+      console.error(err);
+
       setError(
         err instanceof Error
           ? err.message
           : "Unable to track product",
       );
     } finally {
-      setLoading(false);
+      setTracking(false);
     }
   }
 
-  /*
-   * Refresh the price of one product.
-   */
-  async function refreshProduct(productId: number) {
-    const row = rows.find(
-      (item) => item.id === productId,
-    );
+  // --------------------------------------------------
+  // REFRESH PRODUCT PRICE
+  // --------------------------------------------------
 
-    if (!row) {
-      return;
-    }
-
+  async function handleRefresh(productId: number) {
     try {
       setError(null);
 
+      const row = rows.find(
+        (item) => item.id === productId,
+      );
+
+      if (!row) {
+        return;
+      }
+
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/prices/track?url=${encodeURIComponent(
-          row.sourceUrl,
-        )}`,
+        `http://127.0.0.1:8000/api/v1/prices/${productId}/refresh`,
         {
           method: "POST",
         },
       );
 
       if (!response.ok) {
-        throw new Error("Price refresh failed");
+        throw new Error(
+          `Refresh failed (${response.status})`,
+        );
       }
 
       const result = await response.json();
@@ -170,14 +139,10 @@ function App() {
             return item;
           }
 
-          const oldPrice = item.price;
+          const oldPrice = Number(item.price);
+          const newPrice = Number(result.price.value);
 
-          const newPrice = Number(
-            result.price.value,
-          );
-
-          let trend: ProductRow["trend"] =
-            "stable";
+          let trend: ProductRow["trend"] = "stable";
 
           if (newPrice > oldPrice) {
             trend = "up";
@@ -187,36 +152,86 @@ function App() {
 
           return {
             ...item,
-
             price: newPrice,
-
-            currency:
-              result.price.currency,
-
-            availability:
-              result.price.availability,
-
-            fetchedAt:
-              result.price.fetched_at,
-
+            currency: result.price.currency,
+            availability: result.price.availability,
+            fetchedAt: result.price.fetched_at,
             trend,
           };
         }),
       );
     } catch (err) {
+      console.error(err);
+
       setError(
         err instanceof Error
           ? err.message
-          : "Price refresh failed",
+          : "Unable to refresh product",
       );
     }
   }
 
-  /*
-   * Show loading state while PostgreSQL data
-   * is initially being loaded.
-   */
-  if (loading && rows.length === 0) {
+  // --------------------------------------------------
+  // DELETE PRODUCT
+  // --------------------------------------------------
+
+  async function handleDelete(productId: number) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setError(null);
+
+      await deleteProduct(productId);
+
+      setRows((current) =>
+        current.filter(
+          (item) => item.id !== productId,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete product",
+      );
+    }
+  }
+
+  // --------------------------------------------------
+  // CALCULATED SUMMARY
+  // --------------------------------------------------
+
+ const totalProducts = rows.length;
+
+const totalItems = rows.reduce(
+  (total, row) =>
+    total + Number(row.quantity || 1),
+  0,
+);
+
+const totalCurrentPrice = rows.reduce(
+  (total, row) => {
+    const price = Number(row.price || 0);
+    const quantity = Number(row.quantity || 1);
+
+    return total + price * quantity;
+  },
+  0,
+);
+
+  // --------------------------------------------------
+  // RENDER
+  // --------------------------------------------------
+
+  if (loading) {
     return (
       <main className="app">
         <h1>Live Spreadsheet</h1>
@@ -227,18 +242,47 @@ function App() {
 
   return (
     <main className="app">
+
       <header className="app-header">
         <div>
           <h1>Live Spreadsheet</h1>
 
           <p>
-            Track product prices from online
-            sources.
+            Track product prices from online sources.
           </p>
         </div>
       </header>
 
+      {/* -------------------------------------------- */}
+      {/* SUMMARY */}
+      {/* -------------------------------------------- */}
+<section className="summary">
+
+  <div className="summary-card">
+    <span>Total Products</span>
+    <strong>{totalProducts}</strong>
+  </div>
+
+  <div className="summary-card">
+    <span>Total Items</span>
+    <strong>{totalItems}</strong>
+  </div>
+
+  <div className="summary-card">
+    <span>Total Current Value</span>
+    <strong>
+      ₹{totalCurrentPrice.toFixed(2)}
+    </strong>
+  </div>
+
+</section>
+
+      {/* -------------------------------------------- */}
+      {/* ADD PRODUCT */}
+      {/* -------------------------------------------- */}
+
       <section className="toolbar">
+
         <input
           type="url"
           value={url}
@@ -249,14 +293,20 @@ function App() {
         />
 
         <button
+          type="button"
           onClick={handleTrack}
-          disabled={loading || !url.trim()}
+          disabled={tracking}
         >
-          {loading
+          {tracking
             ? "Tracking..."
             : "Track Price"}
         </button>
+
       </section>
+
+      {/* -------------------------------------------- */}
+      {/* ERROR */}
+      {/* -------------------------------------------- */}
 
       {error && (
         <div className="error">
@@ -264,13 +314,21 @@ function App() {
         </div>
       )}
 
+      {/* -------------------------------------------- */}
+      {/* GRID */}
+      {/* -------------------------------------------- */}
+
       <section className="grid-container">
+
         <PriceGrid
           rows={rows}
           onRowsChange={setRows}
           onRefresh={handleRefresh}
+          onDelete={handleDelete}
         />
+
       </section>
+
     </main>
   );
 }
