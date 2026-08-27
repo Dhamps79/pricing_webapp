@@ -1,15 +1,28 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from pathlib import Path
+from uuid import uuid4
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+)
 from sqlalchemy.orm import Session
 
 from app.database.sessions import get_db
+
 from app.repos.catalog_repo import (
     count_catalog,
     latest_prices_for_products,
     list_categories,
     search_catalog,
 )
+
 from app.services.catalog_import_service import (
     catalog_item_payload,
+    create_import_record,
     import_pricelists,
 )
 
@@ -62,17 +75,66 @@ def get_catalog_categories(
     return {"categories": list_categories(db)}
 
 
+
 @router.post("/import")
-def import_catalog(
+async def upload_catalog(
+    file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="File name is required.",
+        )
+
+    extension = Path(file.filename).suffix.lower()
+
+    if extension != ".pdf":
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported.",
+        )
+
+    unique_name = (
+        f"{uuid4().hex}{extension}"
+    )
+
+    file_path = UPLOAD_DIR / unique_name
+
     try:
-        result = import_pricelists(db)
+        contents = await file.read()
+
+        with open(file_path, "wb") as output_file:
+            output_file.write(contents)
+
+        catalog_import = create_import_record(
+            db=db,
+            file_name=file.filename,
+            file_path=str(file_path),
+            supplier_name="Siemens",
+        )
+
+        db.commit()
+        db.refresh(catalog_import)
+
+        return {
+            "id": catalog_import.id,
+            "file_name": catalog_import.file_name,
+            "status": catalog_import.status,
+            "total_rows": catalog_import.total_rows,
+            "imported_rows": catalog_import.imported_rows,
+            "failed_rows": catalog_import.failed_rows,
+        }
+
     except Exception as exc:
         db.rollback()
+
+        if file_path.exists():
+            file_path.unlink()
+
         raise HTTPException(
             status_code=500,
-            detail=str(exc),
+            detail="Unable to upload catalog.",
         ) from exc
 
     return result
