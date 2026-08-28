@@ -14,16 +14,6 @@ def get_product_by_id(
     )
 
 
-def get_product(
-    db: Session,
-    product_id: int,
-) -> Product | None:
-    return get_product_by_id(
-        db=db,
-        product_id=product_id,
-    )
-
-
 def get_product_by_sku(
     db: Session,
     sku: str,

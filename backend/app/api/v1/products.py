@@ -5,8 +5,12 @@ from app.database.sessions import get_db
 from app.schemas.product import ProductCreate, ProductResponse
 from app.services.product_service import (
     create_product_service,
-    get_product_service,
-    search_product_service,
+    delete_product_service,
+    update_product_service,
+)
+from app.repos.product_repo import (
+    get_product_by_id,
+    search_products,
 )
 
 
@@ -45,9 +49,9 @@ def get_product_endpoint(
     db: Session = Depends(get_db),
 ):
 
-    product = get_product_service(
-        db,
-        product_id,
+    product = get_product_by_id(
+        db=db,
+        product_id=product_id,
     )
 
     if product is None:
@@ -72,8 +76,8 @@ def search_products_endpoint(
     db: Session = Depends(get_db),
 ):
 
-    return search_product_service(
-        db,
+    return search_products(
+        db=db,
         query=q,
         category_id=category_id,
         brand_id=brand_id,

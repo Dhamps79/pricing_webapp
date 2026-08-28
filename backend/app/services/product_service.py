@@ -4,9 +4,8 @@ from app.database.models.product import Product
 from app.repos.product_repo import (
     create_product,
     delete_product,
-    get_product,
+    get_product_by_id,
     get_product_by_name,
-    get_product_by_sku,
     search_products,
     update_product,
 )
@@ -46,39 +45,6 @@ def create_product_service(
     )
 
 
-def get_product_service(
-    db: Session,
-    product_id: int,
-) -> Product | None:
-
-    return get_product(
-        db=db,
-        product_id=product_id,
-    )
-
-
-def search_product_service(
-    db: Session,
-    *,
-    query: str | None = None,
-    category_id: int | None = None,
-    brand_id: int | None = None,
-    is_active: bool | None = True,
-    limit: int = 50,
-    offset: int = 0,
-) -> list[Product]:
-
-    return search_products(
-        db=db,
-        query=query,
-        category_id=category_id,
-        brand_id=brand_id,
-        is_active=is_active,
-        limit=limit,
-        offset=offset,
-    )
-
-
 def update_product_service(
     db: Session,
     product_id: int,
@@ -92,7 +58,7 @@ def update_product_service(
     is_active: bool | None = None,
 ) -> Product:
 
-    product = get_product(
+    product = get_product_by_id(
         db=db,
         product_id=product_id,
     )
@@ -131,7 +97,7 @@ def delete_product_service(
     product_id: int,
 ) -> None:
 
-    product = get_product(
+    product = get_product_by_id(
         db=db,
         product_id=product_id,
     )
