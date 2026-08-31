@@ -1,198 +1,113 @@
-from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database.models.product import Product
-from app.database.models.source import Source
-from app.database.models.price_history import PriceHistory
+from app.repos.product_repo import (
+    create_product,
+    delete_product,
+    get_product_by_id,
+    get_product_by_name,
+    search_products,
+    update_product,
+)
 
 
-def list_products(db: Session):
-    # ---------------------------------------------------------
-    # QUERY 1
-    # Get all products
-    # ---------------------------------------------------------
-    products = db.scalars(
-        select(Product)
-        .where(Product.sku.is_(None))
-        .order_by(Product.id.desc())
-    ).all()
+def create_product_service(
+    db: Session,
+    *,
+    name: str,
+    image_url: str | None = None,
+    brand_id: int | None = None,
+    category_id: int | None = None,
+    description: str | None = None,
+    unit: str | None = None,
+    is_active: bool = True,
+) -> Product:
 
-    if not products:
-        return []
-
-    product_ids = [product.id for product in products]
-
-    # ---------------------------------------------------------
-    # QUERY 2
-    # Get the latest Source for each product
-    # ---------------------------------------------------------
-    source_rank = (
-        select(
-            Source.id,
-            Source.product_id,
-            Source.url,
-            Source.domain,
-            Source.source_type,
-            func.row_number()
-            .over(
-                partition_by=Source.product_id,
-                order_by=Source.id.desc(),
-            )
-            .label("row_number"),
-        )
-        .where(Source.product_id.in_(product_ids))
-        .subquery()
+    existing = get_product_by_name(
+        db=db,
+        name=name,
     )
 
-    latest_sources = db.execute(
-        select(
-            source_rank.c.product_id,
-            source_rank.c.url,
-            source_rank.c.domain,
-            source_rank.c.source_type,
-        ).where(source_rank.c.row_number == 1)
-    ).all()
-
-    sources_by_product = {
-        row.product_id: row
-        for row in latest_sources
-    }
-
-    # ---------------------------------------------------------
-    # QUERY 3
-    # Get latest TWO price records for each product
-    # ---------------------------------------------------------
-    price_rank = (
-        select(
-            PriceHistory.id,
-            PriceHistory.product_id,
-            PriceHistory.source_id,
-            PriceHistory.price,
-            PriceHistory.currency,
-            PriceHistory.availability,
-            PriceHistory.fetched_at,
-            func.row_number()
-            .over(
-                partition_by=PriceHistory.product_id,
-                order_by=PriceHistory.fetched_at.desc(),
-            )
-            .label("row_number"),
+    if existing:
+        raise ValueError(
+            "A product with this name already exists."
         )
-        .where(
-            PriceHistory.product_id.in_(product_ids)
-        )
-        .subquery()
+
+    return create_product(
+        db=db,
+        name=name,
+        image_url=image_url,
+        brand_id=brand_id,
+        category_id=category_id,
+        description=description,
+        unit=unit,
+        is_active=is_active,
     )
 
-    price_rows = db.execute(
-        select(
-            price_rank.c.id,
-            price_rank.c.product_id,
-            price_rank.c.source_id,
-            price_rank.c.price,
-            price_rank.c.currency,
-            price_rank.c.availability,
-            price_rank.c.fetched_at,
-            price_rank.c.row_number,
-        ).where(price_rank.c.row_number <= 2)
-    ).all()
 
-    prices_by_product: dict[int, list] = {}
+def update_product_service(
+    db: Session,
+    product_id: int,
+    *,
+    name: str | None = None,
+    image_url: str | None = None,
+    brand_id: int | None = None,
+    category_id: int | None = None,
+    description: str | None = None,
+    unit: str | None = None,
+    is_active: bool | None = None,
+) -> Product:
 
-    for row in price_rows:
-        prices_by_product.setdefault(
-            row.product_id,
-            [],
-        ).append(row)
+    product = get_product_by_id(
+        db=db,
+        product_id=product_id,
+    )
 
-    # ---------------------------------------------------------
-    # Build API response
-    # ---------------------------------------------------------
-    result = []
-
-    for product in products:
-        source = sources_by_product.get(product.id)
-
-        price_records = prices_by_product.get(
-            product.id,
-            [],
+    if product is None:
+        raise ValueError(
+            "Product not found."
         )
 
-        # Because row_number 1 is latest
-        latest = next(
-            (
-                row
-                for row in price_records
-                if row.row_number == 1
-            ),
-            None,
+    if name is not None and name != product.name:
+        existing = get_product_by_name(
+            db=db,
+            name=name,
         )
 
-        previous = next(
-            (
-                row
-                for row in price_records
-                if row.row_number == 2
-            ),
-            None,
+        if existing and existing.id != product.id:
+            raise ValueError(
+                "A product with this name already exists."
+            )
+
+    return update_product(
+        db=db,
+        product=product,
+        name=name,
+        image_url=image_url,
+        brand_id=brand_id,
+        category_id=category_id,
+        description=description,
+        unit=unit,
+        is_active=is_active,
+    )
+
+
+def delete_product_service(
+    db: Session,
+    product_id: int,
+) -> None:
+
+    product = get_product_by_id(
+        db=db,
+        product_id=product_id,
+    )
+
+    if product is None:
+        raise ValueError(
+            "Product not found."
         )
 
-        # -----------------------------------------------------
-        # Calculate trend
-        # -----------------------------------------------------
-        trend = "stable"
-
-        if latest and previous:
-            if latest.price > previous.price:
-                trend = "up"
-
-            elif latest.price < previous.price:
-                trend = "down"
-
-        result.append(
-            {
-                "id": product.id,
-                "name": product.name,
-                "image_url": product.image_url,
-
-                "current_price": (
-                    latest.price
-                    if latest
-                    else None
-                ),
-
-                "currency": (
-                    latest.currency
-                    if latest
-                    else None
-                ),
-
-                "availability": (
-                    latest.availability
-                    if latest
-                    else None
-                ),
-
-                "source_url": (
-                    source.url
-                    if source
-                    else None
-                ),
-
-                "source_domain": (
-                    source.domain
-                    if source
-                    else None
-                ),
-
-                "fetched_at": (
-                    latest.fetched_at
-                    if latest
-                    else None
-                ),
-
-                "trend": trend,
-            }
-        )
-
-    return result
+    delete_product(
+        db=db,
+        product=product,
+    )

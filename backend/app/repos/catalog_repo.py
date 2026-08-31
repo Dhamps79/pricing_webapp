@@ -8,7 +8,71 @@ from app.database.models.costing_sheet_line import CostingSheetLine
 from app.database.models.price_history import PriceHistory
 from app.database.models.product import Product
 from app.database.models.source import Source
+from app.database.models.catalog_import import CatalogImport
+from app.database.models.catalog_import_row import CatalogImportRow
 
+
+def create_catalog_import(
+    db: Session,
+    *,
+    file_name: str,
+    file_path: str | None = None,
+    supplier_name: str | None = None,
+    effective_date=None,
+):
+    import_record = CatalogImport(
+        file_name=file_name,
+        file_path=file_path,
+        supplier_name=supplier_name,
+        effective_date=effective_date,
+        status="uploaded",
+        total_rows=0,
+        imported_rows=0,
+        failed_rows=0,
+    )
+
+    db.add(import_record)
+    db.commit()
+    db.refresh(import_record)
+
+    return import_record
+    return import_record
+
+
+def create_catalog_import_row(
+    db,
+    *,
+    import_id: int,
+    page_number: int | None,
+    row_number: int | None,
+    raw_text: str,
+):
+    row = CatalogImportRow(
+        import_id=import_id,
+        page_number=page_number,
+        row_number=row_number,
+        raw_text=raw_text,
+        parsed_status="pending",
+    )
+
+    db.add(row)
+
+    return row
+
+def get_catalog_import(
+    db: Session,
+    *,
+    import_id: int,
+):
+    """
+    Retrieve a catalog import by ID.
+    """
+
+    return (
+        db.query(CatalogImport)
+        .filter(CatalogImport.id == import_id)
+        .first()
+    )
 
 def search_catalog(
     db: Session,

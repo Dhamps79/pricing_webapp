@@ -1,119 +1,208 @@
-from datetime import datetime, timezone
-from decimal import Decimal
 from pathlib import Path
+from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
-from app.database.models.product import Product
-from app.repos.catalog_repo import get_source_for_product_url
-from app.repos.price_history_repo import create_price_history
-from app.repos.product_repo import create_product, get_product_by_sku
-from app.repos.source_repo import create_source
-from app.services.pricelist_parser import parse_pricelist_pdf
-
-PRICELIST_FILES = [
-    (
-        "Electrical Installation Products from A to Z",
-        "Electrical-Installation-Products-from-A-to-Z-Pricelist-wef-1st-July-2027.pdf",
-    ),
-    (
-        "Low Voltage Control Products",
-        "Low-Voltage-Control-Products_Pricelist_w.e.f_01st_Jul_2026-1.pdf",
-    ),
-    (
-        "Low Voltage Power Distribution Products",
-        "Low-Voltage-Power-Distribution-Products-Pricelist-w.e.f-1st-Jul-2026-1.pdf",
-    ),
-]
+from app.database.models.catalog_import import CatalogImport
+from app.repos.catalog_repo import (
+    create_catalog_import,
+    create_catalog_import_row,
+    get_catalog_import,
+)
+from app.services.pdf_service import extract_pdf_to_raw_rows
+from app.services.catalog_parser_service import (
+    parse_catalog_import_rows,
+)
+items = parse_catalog_import_rows(rows)
 
 
-def default_pricelist_dir() -> Path:
-    return Path(__file__).resolve().parents[3]
+CATALOG_STORAGE_DIR = Path("storage/catalog")
+
+
+def save_catalog_pdf(
+    *,
+    contents: bytes,
+    original_filename: str,
+) -> tuple[str, str]:
+    """
+    Save uploaded PDF to catalog storage.
+
+    Returns:
+        (stored_filename, stored_path)
+    """
+
+    CATALOG_STORAGE_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    suffix = Path(original_filename).suffix.lower()
+
+    if suffix != ".pdf":
+        raise ValueError("Only PDF files are supported.")
+
+    stored_filename = f"{uuid4().hex}.pdf"
+
+    stored_path = CATALOG_STORAGE_DIR / stored_filename
+
+    stored_path.write_bytes(contents)
+
+    return stored_filename, str(stored_path)
+
+
+def extract_and_store_pdf_rows(
+    db: Session,
+    *,
+    import_id: int,
+    file_path: str,
+) -> int:
+    """
+    Extract PDF text and store each extracted row
+    in catalog_import_rows.
+
+    Returns:
+        Number of raw rows created.
+    """
+
+    raw_rows = extract_pdf_to_raw_rows(file_path)
+
+    for item in raw_rows:
+        create_catalog_import_row(
+            db,
+            import_id=import_id,
+            page_number=item["page_number"],
+            row_number=item["row_number"],
+            raw_text=item["raw_text"],
+        )
+
+    return len(raw_rows)
+
+
+def upload_catalog_pdf(
+    db: Session,
+    *,
+    contents: bytes,
+    original_filename: str,
+    supplier_name: str | None = None,
+):
+    """
+    Complete PDF ingestion pipeline.
+
+    1. Save PDF
+    2. Create catalog_imports record
+    3. Extract PDF text
+    4. Store raw rows
+    """
+
+    stored_filename, stored_path = save_catalog_pdf(
+        contents=contents,
+        original_filename=original_filename,
+    )
+
+    import_record = CatalogImport(
+        file_name=original_filename,
+        file_path=stored_path,
+        supplier_name=supplier_name,
+        status="uploaded",
+        total_rows=0,
+        imported_rows=0,
+        failed_rows=0,
+    )
+
+    db.add(import_record)
+    db.flush()
+
+    try:
+        import_record.status = "processing"
+
+        row_count = extract_and_store_pdf_rows(
+            db,
+            import_id=import_record.id,
+            file_path=stored_path,
+        )
+
+        import_record.total_rows = row_count
+        import_record.imported_rows = row_count
+        import_record.status = "extracted"
+
+    except Exception as exc:
+        import_record.status = "failed"
+        import_record.error_message = str(exc)
+
+        db.commit()
+
+        raise
+
+    db.commit()
+    db.refresh(import_record)
+
+    return import_record
+
+
+def create_import_record(
+    db: Session,
+    *,
+    file_name: str,
+    file_path: str | None = None,
+    supplier_name: str | None = None,
+    effective_date=None,
+):
+    """
+    Create a catalog import record.
+    """
+
+    return create_catalog_import(
+        db=db,
+        file_name=file_name,
+        file_path=file_path,
+        supplier_name=supplier_name,
+        effective_date=effective_date,
+    )
+
+
+def get_import(
+    db: Session,
+    import_id: int,
+):
+    """
+    Retrieve a catalog import by ID.
+    """
+
+    return get_catalog_import(
+        db=db,
+        import_id=import_id,
+    )
+
+
+def catalog_item_payload(item):
+    """
+    Convert a Product ORM object into a JSON-safe dictionary.
+    """
+
+    if item is None:
+        return None
+
+    return {
+        "id": item.id,
+        "name": item.name,
+        "sku": getattr(item, "sku", None),
+        "description": getattr(item, "description", None),
+        "unit": getattr(item, "unit", None),
+        "image_url": getattr(item, "image_url", None),
+        "brand_id": getattr(item, "brand_id", None),
+        "category_id": getattr(item, "category_id", None),
+    }
 
 
 def import_pricelists(
     db: Session,
-    directory: str | Path | None = None,
-) -> dict:
-    from app.database.schema import ensure_schema
+    *,
+    import_id: int,
+):
+    """
+    Placeholder for the structured price-list import stage.
+    """
 
-    ensure_schema()
-    root = Path(directory) if directory else default_pricelist_dir()
-    fetched_at = datetime.now(timezone.utc)
-    created = 0
-    updated = 0
-    skipped = 0
-    files = 0
-
-    for title, filename in PRICELIST_FILES:
-        pdf_path = root / filename
-        if not pdf_path.exists():
-            skipped += 1
-            continue
-
-        files += 1
-        source_url = pdf_path.resolve().as_uri()
-        items = parse_pricelist_pdf(pdf_path, title)
-
-        for item in items:
-            product = get_product_by_sku(db, item.sku)
-            if product is None:
-                product = create_product(
-                    db=db,
-                    name=item.name,
-                    image_url=None,
-                    sku=item.sku,
-                    category=item.category,
-                    unit=item.unit,
-                    description=item.description,
-                )
-                created += 1
-            else:
-                product.name = item.name
-                product.category = item.category
-                product.unit = item.unit or product.unit
-                product.description = item.description
-                updated += 1
-
-            source = get_source_for_product_url(db, product.id, source_url)
-            if source is None:
-                source = create_source(
-                    db=db,
-                    product_id=product.id,
-                    url=source_url,
-                    domain=item.source_file,
-                    source_type="pricelist_pdf",
-                )
-
-            create_price_history(
-                db=db,
-                product_id=product.id,
-                source_id=source.id,
-                price=Decimal(str(item.list_price)),
-                currency="INR",
-                availability=f"page {item.page}",
-                fetched_at=fetched_at,
-            )
-
-        db.flush()
-
-    db.commit()
-    return {
-        "files_imported": files,
-        "products_created": created,
-        "products_updated": updated,
-        "files_missing": skipped,
-    }
-
-
-def catalog_item_payload(product: Product, price, currency: str | None) -> dict:
-    return {
-        "id": product.id,
-        "sku": product.sku,
-        "name": product.name,
-        "description": product.description,
-        "category": product.category,
-        "unit": product.unit,
-        "list_price": str(price) if price is not None else None,
-        "currency": currency,
-    }
+    raise NotImplementedError(
+        "Price-list import processing has not been implemented yet."
+    )
