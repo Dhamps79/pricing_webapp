@@ -10,6 +10,10 @@ from app.repos.catalog_repo import (
     get_catalog_import,
 )
 from app.services.pdf_service import extract_pdf_to_raw_rows
+from app.services.catalog_parser_service import (
+    parse_catalog_import_rows,
+)
+items = parse_catalog_import_rows(rows)
 
 
 CATALOG_STORAGE_DIR = Path("storage/catalog")

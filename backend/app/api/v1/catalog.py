@@ -9,7 +9,7 @@ from fastapi import (
     Query,
     UploadFile,
 )
-
+from app.services.pdf_service import extract_pdf_to_raw_rows
 from sqlalchemy.orm import Session   
 from app.database.sessions import get_db
 from app.services.catalog_import_service import (
@@ -17,7 +17,8 @@ from app.services.catalog_import_service import (
     import_pricelists,
     create_import_record,
     extract_and_store_pdf_rows,
-    upload_catalog_pdf
+    upload_catalog_pdf,
+    get_import,
     
 )
 UPLOAD_DIR = Path("storage/catalogs")
@@ -170,7 +171,7 @@ def upload_catalog_pdf(
 
     try:
 
-        total_rows = extract_pdf_to_raw_rows(
+        total_rows = extract_and_store_pdf_rows(
             db=db,
             import_id=import_record.id,
             file_path=str(file_path),

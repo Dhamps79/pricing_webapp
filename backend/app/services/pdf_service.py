@@ -1,46 +1,44 @@
 from pathlib import Path
 
-import pymupdf
+import fitz  # PyMuPDF
 
 
-def extract_pdf_to_raw_rows(file_path: str | Path) -> list[dict]:
+def extract_pdf_to_raw_rows(file_path: str) -> list[dict]:
     """
-    Extract text from every page of a PDF.
+    Extract text from a PDF and return one raw row per
+    non-empty line.
 
-    Returns one raw row per extracted text block.
-
-    The purpose of this function is intentionally limited:
-    PDF -> raw text.
-
-    It does NOT try to understand Siemens product fields yet.
-    Structured parsing will happen in the next layer.
+    Each returned item contains:
+        page_number
+        row_number
+        raw_text
     """
 
-    pdf_path = Path(file_path)
+    path = Path(file_path)
 
-    if not pdf_path.exists():
-        raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+    if not path.exists():
+        raise FileNotFoundError(f"PDF file not found: {path}")
 
-    if pdf_path.suffix.lower() != ".pdf":
-        raise ValueError("Only PDF files are supported")
+    if path.suffix.lower() != ".pdf":
+        raise ValueError("Only PDF files are supported.")
 
     rows: list[dict] = []
 
-    document = fitz.open(pdf_path)
+    document = fitz.open(path)
 
     try:
         for page_index, page in enumerate(document):
             page_number = page_index + 1
 
-            blocks = page.get_text("blocks")
+            text = page.get_text("text")
+
+            if not text:
+                continue
 
             row_number = 0
 
-            for block in blocks:
-                if len(block) < 5:
-                    continue
-
-                raw_text = block[4].strip()
+            for line in text.splitlines():
+                raw_text = line.strip()
 
                 if not raw_text:
                     continue
@@ -59,4 +57,3 @@ def extract_pdf_to_raw_rows(file_path: str | Path) -> list[dict]:
         document.close()
 
     return rows
-
