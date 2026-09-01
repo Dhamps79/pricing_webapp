@@ -6,7 +6,7 @@ import {
   getProducts,
   deleteProduct,
 } from "./services/productApi";
-import { exportCostingSheet } from "./api/costingApi";
+
 function App() {
   const [rows, setRows] = useState<ProductRow[]>([]);
   const [url, setUrl] = useState("");
@@ -301,12 +301,7 @@ const totalCurrentPrice = rows.reduce(
             ? "Tracking..."
             : "Track Price"}
         </button>
-        <button 
-          type="button" 
-          onClick={() => exportCostingSheet(currentSheetId)}
-          className="export-button">
-            Export to Excel
-        </button>
+
       </section>
 
       {/* -------------------------------------------- */}
