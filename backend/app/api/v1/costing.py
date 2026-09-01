@@ -3,6 +3,8 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+from fastapi.responses import StreamingResponse
+from app.services.excel_service import generate_costing_excel
 
 from app.database.sessions import get_db
 from app.services.costing_service import (
@@ -167,3 +169,24 @@ def delete_line(
     if sheet is None:
         raise HTTPException(status_code=404, detail="Line not found")
     return sheet
+@router.get("/{sheet_id}/export")
+def export_costing_sheet(
+    sheet_id: int,
+    db: Session = Depends(get_db)
+):
+    sheet_data = get_sheet(db, sheet_id)
+    if sheet_data is None:
+        raise HTTPException(status_code=404, detail="Costing sheet not found")
+    
+    excel_stream = generate_costing_excel(sheet_data)
+    
+    filename = f"Costing_Sheet_{sheet_id}.xlsx"
+    headers = {
+        "Content-Disposition": f'attachment; filename="{filename}"'
+    }
+    
+    return StreamingResponse(
+        excel_stream, 
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+        headers=headers
+    )
