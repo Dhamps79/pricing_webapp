@@ -1,3 +1,6 @@
+from datetime import datetime
+from decimal import Decimal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -31,6 +34,7 @@ class ProductResponse(BaseModel):
         from_attributes=True,
     )
 
+    # Product
     id: int
     name: str
     brand_id: int | None
@@ -39,3 +43,20 @@ class ProductResponse(BaseModel):
     unit: str | None
     image_url: str | None
     is_active: bool
+
+    # Current pricing
+    current_price: Decimal | None = None
+    previous_price: Decimal | None = None
+    price_change: Decimal | None = None
+    price_change_percent: Decimal | None = None
+
+    currency: str | None = None
+    availability: str | None = None
+
+    # Source
+    source_url: str | None = None
+    source_domain: str | None = None
+    fetched_at: datetime | None = None
+
+    # Trend
+    trend: str | None = None
