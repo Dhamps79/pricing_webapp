@@ -10,10 +10,6 @@ from app.repos.catalog_repo import (
     get_catalog_import,
 )
 from app.services.pdf_service import extract_pdf_to_raw_rows
-from app.services.catalog_parser_service import (
-    parse_catalog_import_rows,
-)
-items = parse_catalog_import_rows(rows)
 
 
 CATALOG_STORAGE_DIR = Path("storage/catalog")
@@ -25,24 +21,24 @@ def save_catalog_pdf(
     original_filename: str,
 ) -> tuple[str, str]:
     """
-    Save uploaded PDF to catalog storage.
+    Save an uploaded catalog PDF to local storage.
 
     Returns:
         (stored_filename, stored_path)
     """
+
+    if not original_filename:
+        raise ValueError("Filename is required.")
+
+    if Path(original_filename).suffix.lower() != ".pdf":
+        raise ValueError("Only PDF files are supported.")
 
     CATALOG_STORAGE_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    suffix = Path(original_filename).suffix.lower()
-
-    if suffix != ".pdf":
-        raise ValueError("Only PDF files are supported.")
-
     stored_filename = f"{uuid4().hex}.pdf"
-
     stored_path = CATALOG_STORAGE_DIR / stored_filename
 
     stored_path.write_bytes(contents)
@@ -57,11 +53,8 @@ def extract_and_store_pdf_rows(
     file_path: str,
 ) -> int:
     """
-    Extract PDF text and store each extracted row
-    in catalog_import_rows.
-
-    Returns:
-        Number of raw rows created.
+    Extract raw rows from a PDF and persist them
+    as CatalogImportRow records.
     """
 
     raw_rows = extract_pdf_to_raw_rows(file_path)
@@ -86,15 +79,22 @@ def upload_catalog_pdf(
     supplier_name: str | None = None,
 ):
     """
-    Complete PDF ingestion pipeline.
+    Complete catalog upload flow:
 
-    1. Save PDF
-    2. Create catalog_imports record
-    3. Extract PDF text
-    4. Store raw rows
+        bytes
+          ↓
+        save PDF
+          ↓
+        create import record
+          ↓
+        extract rows
+          ↓
+        update import status
+          ↓
+        commit
     """
 
-    stored_filename, stored_path = save_catalog_pdf(
+    _, stored_path = save_catalog_pdf(
         contents=contents,
         original_filename=original_filename,
     )
@@ -122,21 +122,16 @@ def upload_catalog_pdf(
         )
 
         import_record.total_rows = row_count
-        import_record.imported_rows = row_count
         import_record.status = "extracted"
 
-    except Exception as exc:
-        import_record.status = "failed"
-        import_record.error_message = str(exc)
-
         db.commit()
+        db.refresh(import_record)
 
+        return import_record
+
+    except Exception:
+        db.rollback()
         raise
-
-    db.commit()
-    db.refresh(import_record)
-
-    return import_record
 
 
 def create_import_record(
@@ -149,6 +144,8 @@ def create_import_record(
 ):
     """
     Create a catalog import record.
+
+    Transaction ownership remains with the caller.
     """
 
     return create_catalog_import(
@@ -164,19 +161,20 @@ def get_import(
     db: Session,
     import_id: int,
 ):
-    """
-    Retrieve a catalog import by ID.
-    """
-
     return get_catalog_import(
         db=db,
         import_id=import_id,
     )
 
 
-def catalog_item_payload(item):
+def catalog_item_payload(
+    item,
+    price=None,
+    currency="INR",
+):
     """
-    Convert a Product ORM object into a JSON-safe dictionary.
+    Convert a catalog product + latest price
+    into an API-friendly dictionary.
     """
 
     if item is None:
@@ -185,24 +183,11 @@ def catalog_item_payload(item):
     return {
         "id": item.id,
         "name": item.name,
-        "sku": getattr(item, "sku", None),
-        "description": getattr(item, "description", None),
-        "unit": getattr(item, "unit", None),
-        "image_url": getattr(item, "image_url", None),
-        "brand_id": getattr(item, "brand_id", None),
-        "category_id": getattr(item, "category_id", None),
+        "description": item.description,
+        "unit": item.unit,
+        "image_url": item.image_url,
+        "brand_id": item.brand_id,
+        "category_id": item.category_id,
+        "price": str(price) if price is not None else None,
+        "currency": currency,
     }
-
-
-def import_pricelists(
-    db: Session,
-    *,
-    import_id: int,
-):
-    """
-    Placeholder for the structured price-list import stage.
-    """
-
-    raise NotImplementedError(
-        "Price-list import processing has not been implemented yet."
-    )
