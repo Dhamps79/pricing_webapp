@@ -391,3 +391,58 @@ def parse_catalog_import_rows(rows) -> list[ParsedCatalogItem]:
     """
 
     return parse_catalog_rows(rows)
+import re
+
+class CatalogParserService:
+    def __init__(self):
+        self.product_code_pattern = re.compile(r'^[A-Z0-9\-]{8,15}$')
+        
+    def parse_catalog_import_rows(self, rows):
+        parsed_items = []
+        current_item = None
+        
+        for row in rows:
+            # 1. Check for boundaries (Headers, Page Footers)
+            if self._is_table_header(row) or self._is_page_footer(row):
+                continue
+                
+            # 2. Check for the Anchor (Product Code)
+            potential_code = self._extract_product_code(row)
+            
+            if potential_code:
+                # Flush the previous item if it exists
+                if current_item:
+                    parsed_items.append(self._finalize_item(current_item))
+                    
+                # Start a new buffer
+                current_item = {
+                    'product_code': potential_code,
+                    'description_buffer': [self._extract_column(row, 'description')],
+                    'technical_buffer': [self._extract_column(row, 'technical')],
+                    'price': self._extract_column(row, 'price')
+                }
+            else:
+                # 3. Append Phase (Multi-line text)
+                if current_item:
+                    desc_chunk = self._extract_column(row, 'description')
+                    tech_chunk = self._extract_column(row, 'technical')
+                    
+                    if desc_chunk:
+                        current_item['description_buffer'].append(desc_chunk)
+                    if tech_chunk:
+                        current_item['technical_buffer'].append(tech_chunk)
+
+        # Flush the final item
+        if current_item:
+            parsed_items.append(self._finalize_item(current_item))
+            
+        return parsed_items
+
+    def _finalize_item(self, item):
+        # Join the buffered arrays with spaces to form the complete multi-line string
+        return {
+            'product_code': item['product_code'],
+            'description': ' '.join(filter(None, item['description_buffer'])).strip(),
+            'technical_specs': ' '.join(filter(None, item['technical_buffer'])).strip(),
+            'price': item['price']
+        }
