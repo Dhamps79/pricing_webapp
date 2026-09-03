@@ -7,27 +7,23 @@ from urllib.parse import urlparse
 
 import httpx
 from bs4 import BeautifulSoup
-from datetime import datetime
-
 from sqlalchemy.orm import Session
 
 from app.repos.price_history_repo import (
+    create_price_history,
     get_latest_price,
     get_price_history,
 )
-from app.repos.product_repo import get_product_by_id
-
 from app.repos.product_repo import (
     create_product,
+    get_product_by_id,
     get_product_by_name,
 )
 from app.repos.source_repo import (
     create_source,
     get_source_by_url,
 )
-from app.repos.price_history_repo import (
-    create_price_history,
-)
+
 USER_AGENT = "LiveSpreadsheetPriceReader/0.1 (+local-development)"
 TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 async def track_price(

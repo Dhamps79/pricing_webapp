@@ -6,12 +6,10 @@ from app.schemas.product import ProductCreate, ProductResponse
 from app.services.product_service import (
     create_product_service,
     delete_product_service,
+    get_products_with_pricing,
     update_product_service,
 )
-from app.repos.product_repo import (
-    get_product_by_id,
-    search_products,
-)
+from app.repos.product_repo import get_product_by_id
 
 
 router = APIRouter(
@@ -75,8 +73,7 @@ def search_products_endpoint(
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
-
-    return search_products(
+    return get_products_with_pricing(
         db=db,
         query=q,
         category_id=category_id,

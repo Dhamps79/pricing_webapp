@@ -1,21 +1,34 @@
 import { useEffect, useState } from "react";
+
 import PriceGrid from "./components/PriceGrid.tsx";
+
 import type { ProductRow } from "./types/price";
+
 import { trackPrice } from "./api/prices.ts";
+
 import {
   getProducts,
+  refreshProduct,
   deleteProduct,
 } from "./services/productApi";
 
+import { productToRow } from "./utils/productMapper";
+
+
 function App() {
   const [rows, setRows] = useState<ProductRow[]>([]);
+
   const [url, setUrl] = useState("");
+
   const [loading, setLoading] = useState(true);
+
   const [tracking, setTracking] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
+
   // --------------------------------------------------
-  // LOAD PRODUCTS FROM POSTGRESQL
+  // LOAD PRODUCTS
   // --------------------------------------------------
 
   useEffect(() => {
@@ -26,7 +39,16 @@ function App() {
 
         const products = await getProducts();
 
-        setRows(products);
+        /*
+         * Backend Product[]
+         *        ↓
+         * productToRow()
+         *        ↓
+         * Frontend ProductRow[]
+         */
+        setRows(
+          products.map(productToRow),
+        );
       } catch (err) {
         console.error(err);
 
@@ -43,12 +65,16 @@ function App() {
     loadProducts();
   }, []);
 
+
   // --------------------------------------------------
-  // ADD / TRACK PRODUCT
+  // TRACK NEW PRODUCT
   // --------------------------------------------------
 
   async function handleTrack() {
-    if (!url.trim()) {
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl) {
+      setError("Please enter a product URL.");
       return;
     }
 
@@ -56,23 +82,47 @@ function App() {
       setTracking(true);
       setError(null);
 
-      const result = await trackPrice(url);
+      const result = await trackPrice(trimmedUrl);
 
       const row: ProductRow = {
         id: result.product.id,
+
         name: result.product.name,
+
         imageUrl: result.product.image_url,
+
         price: Number(result.price.value),
+
+        previousPrice: null,
+
+        priceChange: null,
+
+        priceChangePercent: null,
+
         currency: result.price.currency,
-        availability: result.price.availability,
-        sourceUrl: result.source.url,
-        sourceDomain: result.source.domain,
-        fetchedAt: result.price.fetched_at,
+
+        availability:
+          result.price.availability,
+
+        sourceUrl:
+          result.source.url,
+
+        sourceDomain:
+          result.source.domain,
+
+        fetchedAt:
+          result.price.fetched_at,
+
         trend: "stable",
+
+        // Spreadsheet fields
         quantity: 1,
+
         targetPrice: null,
+
         notes: "",
       };
+
 
       setRows((current) => {
         const existing = current.find(
@@ -81,14 +131,28 @@ function App() {
 
         if (existing) {
           return current.map((item) =>
-            item.id === row.id ? row : item,
+            item.id === row.id
+              ? {
+                  ...row,
+
+                  // Preserve spreadsheet data
+                  quantity: item.quantity,
+                  targetPrice: item.targetPrice,
+                  notes: item.notes,
+                }
+              : item,
           );
         }
 
-        return [...current, row];
+        return [
+          ...current,
+          row,
+        ];
       });
 
+
       setUrl("");
+
     } catch (err) {
       console.error(err);
 
@@ -102,64 +166,66 @@ function App() {
     }
   }
 
+
   // --------------------------------------------------
-  // REFRESH PRODUCT PRICE
+  // REFRESH PRODUCT
   // --------------------------------------------------
 
-  async function handleRefresh(productId: number) {
+  async function handleRefresh(
+    productId: number,
+  ) {
     try {
       setError(null);
 
-      const row = rows.find(
-        (item) => item.id === productId,
+      const existingRow = rows.find(
+        (row) => row.id === productId,
       );
 
-      if (!row) {
+      if (!existingRow) {
+        setError("Product not found.");
         return;
       }
 
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/prices/${productId}/refresh`,
-        {
-          method: "POST",
-        },
-      );
 
-      if (!response.ok) {
-        throw new Error(
-          `Refresh failed (${response.status})`,
-        );
-      }
+      /*
+       * Do NOT call fetch() directly here.
+       *
+       * API request is centralized in:
+       *
+       * services/productApi.ts
+       */
+      const updatedProduct =
+        await refreshProduct(productId);
 
-      const result = await response.json();
+
+      const updatedRow =
+        productToRow(updatedProduct);
+
 
       setRows((current) =>
-        current.map((item) => {
-          if (item.id !== productId) {
-            return item;
-          }
-
-          const oldPrice = Number(item.price);
-          const newPrice = Number(result.price.value);
-
-          let trend: ProductRow["trend"] = "stable";
-
-          if (newPrice > oldPrice) {
-            trend = "up";
-          } else if (newPrice < oldPrice) {
-            trend = "down";
+        current.map((row) => {
+          if (row.id !== productId) {
+            return row;
           }
 
           return {
-            ...item,
-            price: newPrice,
-            currency: result.price.currency,
-            availability: result.price.availability,
-            fetchedAt: result.price.fetched_at,
-            trend,
+            ...updatedRow,
+
+            /*
+             * Keep spreadsheet-specific
+             * values when price changes.
+             */
+            quantity: row.quantity,
+
+            targetPrice:
+              row.targetPrice,
+
+            notes:
+              row.notes,
           };
         }),
       );
+
     } catch (err) {
       console.error(err);
 
@@ -171,18 +237,23 @@ function App() {
     }
   }
 
+
   // --------------------------------------------------
   // DELETE PRODUCT
   // --------------------------------------------------
 
-  async function handleDelete(productId: number) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product?",
-    );
+  async function handleDelete(
+    productId: number,
+  ) {
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete this product?",
+      );
 
     if (!confirmed) {
       return;
     }
+
 
     try {
       setError(null);
@@ -191,9 +262,10 @@ function App() {
 
       setRows((current) =>
         current.filter(
-          (item) => item.id !== productId,
+          (row) => row.id !== productId,
         ),
       );
+
     } catch (err) {
       console.error(err);
 
@@ -205,77 +277,145 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // CALCULATED SUMMARY
-  // --------------------------------------------------
-
- const totalProducts = rows.length;
-
-const totalItems = rows.reduce(
-  (total, row) =>
-    total + Number(row.quantity || 1),
-  0,
-);
-
-const totalCurrentPrice = rows.reduce(
-  (total, row) => {
-    const price = Number(row.price || 0);
-    const quantity = Number(row.quantity || 1);
-
-    return total + price * quantity;
-  },
-  0,
-);
 
   // --------------------------------------------------
-  // RENDER
+  // SUMMARY
+  // --------------------------------------------------
+
+  const totalProducts =
+    rows.length;
+
+
+  const totalItems =
+    rows.reduce(
+      (total, row) =>
+        total +
+        Number(
+          row.quantity || 1,
+        ),
+      0,
+    );
+
+
+  const totalCurrentPrice =
+    rows.reduce(
+      (total, row) => {
+        const price =
+          Number(
+            row.price || 0,
+          );
+
+        const quantity =
+          Number(
+            row.quantity || 1,
+          );
+
+        return (
+          total +
+          price * quantity
+        );
+      },
+      0,
+    );
+
+
+  // --------------------------------------------------
+  // LOADING
   // --------------------------------------------------
 
   if (loading) {
     return (
       <main className="app">
-        <h1>Live Spreadsheet</h1>
-        <p>Loading products...</p>
+
+        <h1>
+          Live Spreadsheet
+        </h1>
+
+        <p>
+          Loading products...
+        </p>
+
       </main>
     );
   }
 
+
+  // --------------------------------------------------
+  // RENDER
+  // --------------------------------------------------
+
   return (
     <main className="app">
 
+      {/* -------------------------------------------- */}
+      {/* HEADER */}
+      {/* -------------------------------------------- */}
+
       <header className="app-header">
+
         <div>
-          <h1>Live Spreadsheet</h1>
+
+          <h1>
+            Live Spreadsheet
+          </h1>
 
           <p>
-            Track product prices from online sources.
+            Track product prices
+            from online sources.
           </p>
+
         </div>
+
       </header>
+
 
       {/* -------------------------------------------- */}
       {/* SUMMARY */}
       {/* -------------------------------------------- */}
-<section className="summary">
 
-  <div className="summary-card">
-    <span>Total Products</span>
-    <strong>{totalProducts}</strong>
-  </div>
+      <section className="summary">
 
-  <div className="summary-card">
-    <span>Total Items</span>
-    <strong>{totalItems}</strong>
-  </div>
+        <div className="summary-card">
 
-  <div className="summary-card">
-    <span>Total Current Value</span>
-    <strong>
-      ₹{totalCurrentPrice.toFixed(2)}
-    </strong>
-  </div>
+          <span>
+            Total Products
+          </span>
 
-</section>
+          <strong>
+            {totalProducts}
+          </strong>
+
+        </div>
+
+
+        <div className="summary-card">
+
+          <span>
+            Total Items
+          </span>
+
+          <strong>
+            {totalItems}
+          </strong>
+
+        </div>
+
+
+        <div className="summary-card">
+
+          <span>
+            Total Current Value
+          </span>
+
+          <strong>
+            ₹
+            {totalCurrentPrice.toFixed(2)}
+          </strong>
+
+        </div>
+
+      </section>
+
 
       {/* -------------------------------------------- */}
       {/* ADD PRODUCT */}
@@ -290,12 +430,17 @@ const totalCurrentPrice = rows.reduce(
             setUrl(event.target.value)
           }
           placeholder="Paste a product URL..."
+          disabled={tracking}
         />
+
 
         <button
           type="button"
           onClick={handleTrack}
-          disabled={tracking}
+          disabled={
+            tracking ||
+            !url.trim()
+          }
         >
           {tracking
             ? "Tracking..."
@@ -304,18 +449,22 @@ const totalCurrentPrice = rows.reduce(
 
       </section>
 
+
       {/* -------------------------------------------- */}
       {/* ERROR */}
       {/* -------------------------------------------- */}
 
       {error && (
         <div className="error">
+
           {error}
+
         </div>
       )}
 
+
       {/* -------------------------------------------- */}
-      {/* GRID */}
+      {/* PRODUCT GRID */}
       {/* -------------------------------------------- */}
 
       <section className="grid-container">
@@ -332,5 +481,6 @@ const totalCurrentPrice = rows.reduce(
     </main>
   );
 }
+
 
 export default App;

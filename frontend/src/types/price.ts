@@ -1,19 +1,26 @@
+import type { PriceTrend } from "./product";
+
 export interface ProductRow {
   id: number;
   name: string;
+
   imageUrl: string | null;
 
   price: number;
-  currency: string;
+  previousPrice: number | null;
 
+  priceChange: number | null;
+  priceChangePercent: number | null;
+
+  currency: string;
   availability: string | null;
 
-  sourceUrl: string;
-  sourceDomain: string;
+  sourceUrl: string | null;
+  sourceDomain: string | null;
 
-  fetchedAt: string;
+  fetchedAt: string | null;
 
-  trend: "up" | "down" | "stable";
+  trend: PriceTrend;
 
   // Spreadsheet fields
   quantity: number;
