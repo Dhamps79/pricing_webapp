@@ -2,14 +2,9 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-from app.database.models import (  # noqa: F401
-    CostingSheet,
-    CostingSheetLine,
-    PriceHistory,
-    Product,
-    Source,
-)
+
 from app.core.config import get_settings
+from app.database import models  
 from app.database.base import Base
 
 

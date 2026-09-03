@@ -10,6 +10,11 @@ from app.database.models.product import Product
 from app.database.models.source import Source
 from app.database.models.catalog_import import CatalogImport
 from app.database.models.catalog_import_row import CatalogImportRow
+from app.database.models.catalog_price import CatalogPrice
+from app.database.models.catalog_import_row import CatalogImportRow
+from app.database.models.category import Category
+from app.database.models.product import Product
+from app.database.models.product_code import ProductCode
 
 
 def create_catalog_import(
@@ -74,6 +79,7 @@ def get_catalog_import(
         .first()
     )
 
+
 def search_catalog(
     db: Session,
     query: str | None = None,
@@ -81,29 +87,50 @@ def search_catalog(
     limit: int = 50,
     offset: int = 0,
 ) -> list[Product]:
+
     statement = (
         select(Product)
-        .where(Product.sku.is_not(None))
-        .order_by(Product.category, Product.sku)
+        .join(
+            ProductCode,
+            ProductCode.product_id == Product.id,
+            isouter=True,
+        )
+        .join(
+            Category,
+            Category.id == Product.category_id,
+            isouter=True,
+        )
+        .options(
+            selectinload(Product.codes),
+            selectinload(Product.category),
+            selectinload(Product.brand),
+        )
+        .where(Product.is_active.is_(True))
+        .distinct()
+        .order_by(Product.name)
         .offset(offset)
         .limit(limit)
     )
 
     if query:
         pattern = f"%{query.strip()}%"
+
         statement = statement.where(
             or_(
-                Product.sku.ilike(pattern),
                 Product.name.ilike(pattern),
                 Product.description.ilike(pattern),
-                Product.category.ilike(pattern),
+                ProductCode.code.ilike(pattern),
             )
         )
 
     if category:
-        statement = statement.where(Product.category == category)
+        statement = statement.where(
+            Category.name == category
+        )
 
-    return list(db.scalars(statement).all())
+    return list(
+        db.scalars(statement).unique().all()
+    )
 
 
 def count_catalog(
@@ -131,61 +158,84 @@ def count_catalog(
 
 
 def list_categories(db: Session) -> list[str]:
+
     statement = (
-        select(Product.category)
-        .where(Product.category.is_not(None), Product.sku.is_not(None))
+        select(Category.name)
+        .join(
+            Product,
+            Product.category_id == Category.id,
+        )
+        .where(
+            Product.is_active.is_(True),
+            Category.is_active.is_(True),
+        )
         .distinct()
-        .order_by(Product.category)
+        .order_by(Category.name)
     )
-    return [row[0] for row in db.execute(statement).all() if row[0]]
 
+    return list(
+        db.scalars(statement).all()
+    )
 
-def latest_prices_for_products(
+def latest_catalog_prices_for_products(
     db: Session,
     product_ids: list[int],
-) -> dict[int, PriceHistory]:
+) -> dict[int, CatalogPrice]:
+
     if not product_ids:
         return {}
 
-    rank = (
+    ranked = (
         select(
-            PriceHistory.id,
-            PriceHistory.product_id,
-            PriceHistory.price,
-            PriceHistory.currency,
-            PriceHistory.fetched_at,
+            CatalogPrice.id,
+            CatalogPrice.product_id,
+            CatalogPrice.price,
+            CatalogPrice.currency,
+            CatalogPrice.unit,
+            CatalogPrice.standard_package,
+            CatalogPrice.created_at,
             func.row_number()
             .over(
-                partition_by=PriceHistory.product_id,
-                order_by=PriceHistory.fetched_at.desc(),
+                partition_by=CatalogPrice.product_id,
+                order_by=(
+                    CatalogPrice.created_at.desc(),
+                    CatalogPrice.id.desc(),
+                ),
             )
-            .label("row_number"),
+            .label("rn"),
         )
-        .where(PriceHistory.product_id.in_(product_ids))
+        .where(
+            CatalogPrice.product_id.in_(product_ids)
+        )
         .subquery()
     )
 
     rows = db.execute(
         select(
-            rank.c.id,
-            rank.c.product_id,
-            rank.c.price,
-            rank.c.currency,
-            rank.c.fetched_at,
-        ).where(rank.c.row_number == 1)
+            ranked.c.id,
+            ranked.c.product_id,
+            ranked.c.price,
+            ranked.c.currency,
+            ranked.c.unit,
+            ranked.c.standard_package,
+            ranked.c.created_at,
+        ).where(
+            ranked.c.rn == 1
+        )
     ).all()
 
-    latest: dict[int, PriceHistory] = {}
-    for row in rows:
-        history = PriceHistory(
+    return {
+        row.product_id: CatalogPrice(
             id=row.id,
             product_id=row.product_id,
             price=row.price,
             currency=row.currency,
-            fetched_at=row.fetched_at,
+            unit=row.unit,
+            standard_package=row.standard_package,
+            created_at=row.created_at,
         )
-        latest[row.product_id] = history
-    return latest
+        for row in rows
+    }
 
 
 def list_costing_sheets(db: Session) -> list[CostingSheet]:
