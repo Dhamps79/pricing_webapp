@@ -172,70 +172,92 @@ function App() {
   // --------------------------------------------------
 
   async function handleRefresh(
-    productId: number,
-  ) {
-    try {
-      setError(null);
+  productId: number,
+) {
+  try {
+    setError(null);
 
-      const existingRow = rows.find(
-        (row) => row.id === productId,
-      );
+    const existingRow = rows.find(
+      (row) => row.id === productId,
+    );
 
-      if (!existingRow) {
-        setError("Product not found.");
-        return;
-      }
-
-
-      /*
-       * Do NOT call fetch() directly here.
-       *
-       * API request is centralized in:
-       *
-       * services/productApi.ts
-       */
-      const updatedProduct =
-        await refreshProduct(productId);
-
-
-      const updatedRow =
-        productToRow(updatedProduct);
-
-
-      setRows((current) =>
-        current.map((row) => {
-          if (row.id !== productId) {
-            return row;
-          }
-
-          return {
-            ...updatedRow,
-
-            /*
-             * Keep spreadsheet-specific
-             * values when price changes.
-             */
-            quantity: row.quantity,
-
-            targetPrice:
-              row.targetPrice,
-
-            notes:
-              row.notes,
-          };
-        }),
-      );
-
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to refresh product",
-      );
+    if (!existingRow) {
+      throw new Error("Product not found.");
     }
+
+    const result =
+      await refreshProduct(productId);
+
+    const price =
+      Number(result.price.value);
+
+    const previousPrice =
+      existingRow.price;
+
+    const priceChange =
+      price - previousPrice;
+
+    const priceChangePercent =
+      previousPrice !== 0
+        ? (priceChange / previousPrice) * 100
+        : null;
+
+    let trend:
+      | "up"
+      | "down"
+      | "stable" = "stable";
+
+    if (price > previousPrice) {
+      trend = "up";
+    } else if (price < previousPrice) {
+      trend = "down";
+    }
+
+    setRows((current) =>
+      current.map((row) =>
+        row.id !== productId
+          ? row
+          : {
+              ...row,
+              name: result.product.name,
+              imageUrl:
+                result.product.image_url,
+
+              price,
+              previousPrice,
+              priceChange,
+              priceChangePercent,
+
+              currency:
+                result.price.currency,
+
+              availability:
+                result.price.availability,
+
+              sourceUrl:
+                result.source.url,
+
+              sourceDomain:
+                result.source.domain,
+
+              fetchedAt:
+                result.price.fetched_at,
+
+              trend,
+            },
+      ),
+    );
+
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Unable to refresh product",
+    );
   }
+}
 
 
   // --------------------------------------------------

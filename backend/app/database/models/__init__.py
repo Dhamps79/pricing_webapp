@@ -12,3 +12,4 @@ from app.database.models.costing_sheet_line import CostingSheetLine
 from app.database.models.catalog_import import CatalogImport
 from app.database.models.catalog_price import CatalogPrice
 from app.database.models.catalog_import_row import CatalogImportRow
+from app.database.models.product_tracking import ProductTracking 

@@ -1,29 +1,39 @@
-import type { PriceTrend } from "./product";
-
-export interface ProductRow {
+export interface PriceHistoryItem {
   id: number;
-  name: string;
-
-  imageUrl: string | null;
-
-  price: number;
-  previousPrice: number | null;
-
-  priceChange: number | null;
-  priceChangePercent: number | null;
-
-  currency: string;
+  price: string;
+  currency: string | null;
   availability: string | null;
+  fetched_at: string;
+}
 
-  sourceUrl: string | null;
-  sourceDomain: string | null;
+export interface PriceHistoryResponse {
+  product: {
+    id: number;
+    name: string;
+  };
 
-  fetchedAt: string | null;
+  history: PriceHistoryItem[];
+}
 
-  trend: PriceTrend;
+export interface TrackedPriceResponse {
+  product: {
+    id: number;
+    name: string;
+    image_url: string | null;
+  };
 
-  // Spreadsheet fields
-  quantity: number;
-  targetPrice: number | null;
-  notes: string;
+  source: {
+    id: number;
+    url: string;
+    domain: string;
+    source_type: string;
+  };
+
+  price: {
+    id: number;
+    value: string;
+    currency: string | null;
+    availability: string | null;
+    fetched_at: string;
+  };
 }
