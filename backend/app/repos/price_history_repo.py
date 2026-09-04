@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-
+from collections import defaultdict
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -67,70 +67,56 @@ def get_price_history(
 
 def get_latest_prices_for_products(
     db: Session,
+    *,
     product_ids: list[int],
-) -> dict[int, list[tuple[PriceHistory, Source]]]:
-    """
-    Return the two most recent price records for every product,
-    together with their Source.
-
-    Uses one SQL query for all requested products.
-    """
-
+):
     if not product_ids:
         return {}
 
     ranked = (
-        select(
-            PriceHistory.id.label("id"),
+        db.query(
+            PriceHistory.id.label("price_id"),
             func.row_number()
             .over(
                 partition_by=PriceHistory.product_id,
-                order_by=(
-                    PriceHistory.fetched_at.desc(),
-                    PriceHistory.id.desc(),
-                ),
+                order_by=PriceHistory.fetched_at.desc(),
             )
-            .label("price_rank"),
+            .label("rn"),
         )
-        .where(
+        .filter(
             PriceHistory.product_id.in_(product_ids)
         )
         .subquery()
     )
 
-    statement = (
-        select(
+    rows = (
+        db.query(
             PriceHistory,
             Source,
         )
         .join(
             ranked,
-            PriceHistory.id == ranked.c.id,
+            ranked.c.price_id == PriceHistory.id,
         )
         .join(
             Source,
-            PriceHistory.source_id == Source.id,
+            Source.id == PriceHistory.source_id,
         )
-        .where(
-            ranked.c.price_rank <= 2
+        .filter(
+            ranked.c.rn <= 2
         )
         .order_by(
-            PriceHistory.product_id.asc(),
+            PriceHistory.product_id,
             PriceHistory.fetched_at.desc(),
-            PriceHistory.id.desc(),
         )
+        .all()
     )
 
-    records = db.execute(statement).all()
+    result = defaultdict(list)
 
-    result: dict[int, list[tuple[PriceHistory, Source]]] = {}
-
-    for price_history, source in records:
-        result.setdefault(
-            price_history.product_id,
-            [],
-        ).append(
-            (price_history, source)
+    for history, source in rows:
+        result[history.product_id].append(
+            (history, source)
         )
 
-    return result
+    return dict(result)

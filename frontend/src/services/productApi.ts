@@ -1,8 +1,17 @@
 import type { Product } from "../types/product";
+import type {
+  PriceHistoryResponse,
+  TrackedPriceResponse,
+} from "../types/price";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  "http://127.0.0.1:8000/api/v1";
 
-async function parseError(response: Response): Promise<string> {
+
+async function parseError(
+  response: Response,
+): Promise<string> {
   try {
     const body = await response.json();
 
@@ -15,6 +24,7 @@ async function parseError(response: Response): Promise<string> {
     return `Request failed with status ${response.status}`;
   }
 }
+
 
 async function request<T>(
   path: string,
@@ -35,6 +45,10 @@ async function request<T>(
     throw new Error(
       await parseError(response),
     );
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return response.json();
@@ -101,13 +115,15 @@ export async function getProduct(
 }
 
 
-export async function refreshProduct(
+export async function updateProduct(
   productId: number,
+  payload: Partial<Product>,
 ): Promise<Product> {
   return request<Product>(
-    `/prices/${productId}/refresh`,
+    `/products/${productId}`,
     {
-      method: "POST",
+      method: "PATCH",
+      body: JSON.stringify(payload),
     },
   );
 }
@@ -116,10 +132,31 @@ export async function refreshProduct(
 export async function deleteProduct(
   productId: number,
 ): Promise<void> {
-  await request(
+  await request<void>(
     `/products/${productId}`,
     {
       method: "DELETE",
     },
+  );
+}
+
+
+export async function refreshProduct(
+  productId: number,
+): Promise<TrackedPriceResponse> {
+  return request<TrackedPriceResponse>(
+    `/prices/${productId}/refresh`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+
+export async function getPriceHistory(
+  productId: number,
+): Promise<PriceHistoryResponse> {
+  return request<PriceHistoryResponse>(
+    `/prices/${productId}/history`,
   );
 }
