@@ -2,12 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
-from app.core.config import settings
+from app.core.config import get_settings
+
+
+settings = get_settings()
 
 
 app = FastAPI(
-    title="Live Spreadsheet API",
-    version="1.0.0",
+    title=settings.app_name,
 )
 
 

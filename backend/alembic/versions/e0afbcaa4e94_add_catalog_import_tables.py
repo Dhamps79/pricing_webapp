@@ -32,7 +32,7 @@ def upgrade() -> None:
     sa.Column('imported_rows', sa.Integer(), nullable=False),
     sa.Column('failed_rows', sa.Integer(), nullable=False),
     sa.Column('error_message', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at',server_default=sa.func.now(), nullable=False),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )

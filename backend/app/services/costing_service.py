@@ -4,14 +4,16 @@ from sqlalchemy.orm import Session
 
 from app.database.models.costing_sheet import CostingSheet
 from app.database.models.costing_sheet_line import CostingSheetLine
+
 from app.repos.catalog_repo import (
     add_costing_line,
     create_costing_sheet,
     delete_costing_line,
     get_costing_sheet,
-    latest_prices_for_products,
+    latest_catalog_prices_for_products,
     list_costing_sheets,
 )
+
 from app.repos.product_repo import get_product_by_id
 
 
@@ -149,7 +151,11 @@ def add_product_to_sheet(
     if sheet is None or product is None:
         return None
 
-    prices = latest_prices_for_products(db, [product.id])
+    prices = prices = latest_catalog_prices_for_products(
+        db,
+        [product.id],
+        )
+    
     latest = prices.get(product.id)
     list_price = latest.price if latest else Decimal("0")
     unit_sell = sell_price if sell_price is not None else list_price
