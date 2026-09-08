@@ -183,9 +183,7 @@ def extract_pdf_coordinate_rows(
                     f"Invalid PDF page number: {page_number}"
                 )
 
-            page = document.pages[
-                page_number - 1
-            ]
+            page = document.pages[page_number - 1]
 
             words = page.extract_words()
             coordinate_words = [

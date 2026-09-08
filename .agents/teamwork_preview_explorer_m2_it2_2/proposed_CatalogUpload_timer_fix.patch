@@ -1,0 +1,34 @@
+--- a/frontend/src/components/CatalogUpload.tsx
++++ b/frontend/src/components/CatalogUpload.tsx
+@@ -56,9 +56,11 @@
+   // Active ticking elapsed timer during uploading and parsing states
+   useEffect(() => {
+     if (status === "uploading" || status === "parsing") {
+-      startTimeRef.current = Date.now();
++      if (!startTimeRef.current || startTimeRef.current === 0) {
++        startTimeRef.current = Date.now();
++      }
+       timerRef.current = window.setInterval(() => {
+         setElapsedSeconds(Number(((Date.now() - startTimeRef.current) / 1000).toFixed(1)));
+       }, 100);
+     } else {
+       if (timerRef.current !== null) {
+@@ -141,7 +143,9 @@
+   // Trigger catalog upload
+   const handleStartUpload = async () => {
+     if (!file) return;
+ 
++    startTimeRef.current = Date.now();
++    setElapsedSeconds(0);
+     setStatus("uploading");
+     setProgress(0);
+     setErrorMessage(null);
+@@ -171,7 +175,8 @@
+     } catch (err: any) {
+       const msg = err instanceof Error ? err.message : "Upload failed unexpectedly.";
+       setErrorMessage(msg);
+       setStatus("failed");
++      startTimeRef.current = 0;
+ 
+       if (onUploadError) {
+         onUploadError(err instanceof Error ? err : new Error(msg));

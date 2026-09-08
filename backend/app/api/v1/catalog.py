@@ -7,7 +7,7 @@ from fastapi import (
     UploadFile,
 )
 from sqlalchemy import func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 import shutil
 from app.database.models.catalog_price import CatalogPrice
 from app.database.models.category import Category
@@ -128,6 +128,12 @@ def search_catalog_items(
 
     statement = (
         select(Product)
+        .options(
+            selectinload(Product.codes),
+            selectinload(Product.category),
+            selectinload(Product.brand),
+            selectinload(Product.attributes),
+        )
         .outerjoin(ProductCode, ProductCode.product_id == Product.id)
         .outerjoin(Category, Category.id == Product.category_id)
         .where(Product.is_active.is_(True))
@@ -175,8 +181,8 @@ def search_catalog_items(
         items.append(
             catalog_item_payload(
                 product,
-                latest_price.price if latest_price else None,
-                latest_price.currency if latest_price else "INR",
+                price=latest_price.price if latest_price else None,
+                currency=latest_price.currency if latest_price else "INR",
             )
         )
 

@@ -698,18 +698,52 @@ def catalog_item_payload(
     if item is None:
         return None
 
+    product_code: str | None = None
+    codes = getattr(item, "codes", None)
+    if codes:
+        product_code = next(
+            (c.code for c in codes if getattr(c, "is_primary", False)),
+            codes[0].code if len(codes) > 0 and hasattr(codes[0], "code") else None,
+        )
+
+    brand_obj = getattr(item, "brand", None)
+    brand_name: str | None = (
+        brand_obj.name
+        if brand_obj and hasattr(brand_obj, "name")
+        else None
+    )
+
+    category_obj = getattr(item, "category", None)
+    category_name: str | None = (
+        category_obj.name
+        if category_obj and hasattr(category_obj, "name")
+        else None
+    )
+
+    attributes_dict: dict[str, str] = {}
+    attrs = getattr(item, "attributes", None)
+    if attrs:
+        for attr in attrs:
+            attr_name = getattr(attr, "attribute_name", None)
+            if attr_name:
+                attributes_dict[attr_name] = getattr(attr, "attribute_value", "")
+
     return {
         "id": item.id,
+        "product_code": product_code,
         "name": item.name,
         "description": item.description,
         "unit": item.unit,
         "image_url": item.image_url,
         "brand_id": item.brand_id,
+        "brand": brand_name,
         "category_id": item.category_id,
+        "category": category_name,
         "price": (
             str(price)
             if price is not None
             else None
         ),
         "currency": currency,
+        "attributes": attributes_dict,
     }
