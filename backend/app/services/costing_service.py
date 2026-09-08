@@ -34,13 +34,27 @@ def serialize_sheet(sheet: CostingSheet) -> dict:
         list_total += line_list
         net_total += line_net
         product = line.product
+        sku = None
+        if product and product.codes:
+            primary_code = next(
+                (c.code for c in product.codes if c.is_primary),
+                product.codes[0].code,
+            )
+            sku = primary_code
+
+        category_name = (
+            product.category.name
+            if (product and product.category)
+            else None
+        )
+
         lines.append(
             {
                 "id": line.id,
                 "product_id": line.product_id,
-                "sku": product.sku if product else None,
+                "sku": sku,
                 "name": product.name if product else "",
-                "category": product.category if product else None,
+                "category": category_name,
                 "quantity": str(line.quantity),
                 "unit": line.unit,
                 "list_price": str(line.list_price),
@@ -151,10 +165,10 @@ def add_product_to_sheet(
     if sheet is None or product is None:
         return None
 
-    prices = prices = latest_catalog_prices_for_products(
+    prices = latest_catalog_prices_for_products(
         db,
         [product.id],
-        )
+    )
     
     latest = prices.get(product.id)
     list_price = latest.price if latest else Decimal("0")

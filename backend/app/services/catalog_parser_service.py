@@ -64,29 +64,31 @@ def looks_like_product_code(value: str | None) -> bool:
 
 def parse_price(value: str | None) -> Decimal | None:
     value = normalize_text(value)
-
     if not value:
         return None
-
-    # Siemens notation:
-    # 925.-
-    # 5595.-
+        
+    # Siemens notation: 925.-
     if value.endswith(".-"):
         value = value[:-2]
-
+        
+    # Clean up standard currency formats and spaces
     value = (
         value
         .replace(",", "")
-        .replace("₹", "")
+        .replace(" ", "")
         .replace("Rs.", "")
+        .replace("₹", "")  # Added support for Rupee symbol
         .strip()
     )
-
-    if not re.fullmatch(r"\d+(?:\.\d+)?", value):
+    
+    # Use re.search instead of fullmatch to extract just the numbers 
+    # even if stray characters are attached
+    match = re.search(r"\d+(?:\.\d+)?", value)
+    if not match:
         return None
-
+        
     try:
-        return Decimal(value)
+        return Decimal(match.group())
     except InvalidOperation:
         return None
 
