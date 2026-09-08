@@ -8,7 +8,7 @@ from fastapi import (
 )
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
-
+import shutil
 from app.database.models.catalog_price import CatalogPrice
 from app.database.models.category import Category
 from app.database.models.product import Product
@@ -18,6 +18,7 @@ from app.services.catalog_import_service import (
     catalog_item_payload,
     upload_catalog_pdf,
 )
+
 
 
 router = APIRouter(

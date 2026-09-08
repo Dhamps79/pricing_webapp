@@ -10,6 +10,7 @@ from app.schemas.product import (
     ProductResponse,
     ProductUpdate,
 )
+from app.services.price_service import get_product_price_history
 from app.services.product_service import (
     create_product_service,
     delete_product_service,

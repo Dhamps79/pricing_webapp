@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence, cast
-
-import fitz  # PyMuPDF
+import pdfplumber
+import re
 
 
 @dataclass(frozen=True, slots=True)
@@ -163,13 +163,14 @@ def extract_pdf_coordinate_rows(
             "Only PDF files are supported."
         )
 
-    document = fitz.open(path)
+    document = pdfplumber.open(path)
 
     try:
+        total_pages = len(document.pages)
         if page_numbers is None:
             selected_pages = range(
                 1,
-                len(document) + 1,
+                total_pages + 1,
             )
         else:
             selected_pages = page_numbers
@@ -177,35 +178,29 @@ def extract_pdf_coordinate_rows(
         result: dict[int, list[CoordinateRow]] = {}
 
         for page_number in selected_pages:
-            if page_number < 1 or page_number > len(document):
+            if page_number < 1 or page_number > total_pages:
                 raise ValueError(
                     f"Invalid PDF page number: {page_number}"
                 )
 
-            page = document[
+            page = document.pages[
                 page_number - 1
             ]
 
-            words = cast(
-                list[tuple[float, float, float, float, str, int, int, int]],
-                page.get_text(
-                    "words",
-                    sort=False,
-                ),
-            )
+            words = page.extract_words()
             coordinate_words = [
                 CoordinateWord(
-                    text=word[4],
-                    x0=word[0],
-                    y0=word[1],
-                    x1=word[2],
-                    y1=word[3],
-                    block_no=word[5],
-                    line_no=word[6],
-                    word_no=word[7],
+                    text=word["text"],
+                    x0=float(word["x0"]),
+                    y0=float(word.get("top", word.get("y0", 0))),
+                    x1=float(word["x1"]),
+                    y1=float(word.get("bottom", word.get("y1", 0))),
+                    block_no=0,
+                    line_no=0,
+                    word_no=index,
                 )
-                for word in words
-                if word[4].strip()
+                for index, word in enumerate(words)
+                if word.get("text", "").strip()
             ]
 
             result[page_number] = (
@@ -292,14 +287,13 @@ def extract_pdf_to_raw_rows(
 
     rows: list[dict] = []
 
-    document = fitz.open(path)
+    document = pdfplumber.open(path)
 
     try:
-        for page_index in range(len(document)):
-            page = document[page_index]
+        for page_index, page in enumerate(document.pages):
             page_number = page_index + 1
 
-            text = cast(str, page.get_text("text"))
+            text = page.extract_text()
 
             if not text:
                 continue

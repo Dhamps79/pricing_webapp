@@ -452,32 +452,19 @@ def detect_table_type(
     rows: list[CoordinateRow],
 ) -> str | None:
     """
-    Identify supported Siemens table layouts.
-
-    Page numbers are used as a guard because coordinates are meaningful only
-    for the corresponding table layout. Header/text checks provide an
-    additional safety mechanism.
+    Identify supported Siemens table layouts dynamically.
+    Removed hardcoded page numbers to support new catalog versions.
     """
-
     text = _page_text(rows)
-
-    # Verified 5SL7 MCB pages.
-    if page_number in {8, 9}:
-        if (
-            "reference" in text
-            and "mrp" in text
-        ):
-            return "mcb"
-
-    # Verified DOL starter page.
-    if page_number == 49:
-        if (
-            "starter" in text
-            and "contactor" in text
-            and "thermal" in text
-        ):
-            return "dol"
-
+    
+    # Detect MCB tables on any page
+    if "reference" in text and "mrp" in text:
+        return "mcb"
+        
+    # Detect DOL starter tables on any page
+    if "starter" in text and "contactor" in text and "thermal" in text:
+        return "dol"
+        
     return None
 
 

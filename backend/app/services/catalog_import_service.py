@@ -692,7 +692,6 @@ def get_import(
 
 def catalog_item_payload(
     item: Product | None,
-    *,
     price=None,
     currency: str = "INR",
 ) -> dict | None:
