@@ -1,5 +1,6 @@
 from decimal import Decimal
 import io
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -33,7 +34,7 @@ def test_readiness_check():
 # ===========================================================================
 
 def test_product_lifecycle():
-    unique_name = "QA Test Circuit Breaker 5SL7"
+    unique_name = f"QA Test Circuit Breaker {uuid.uuid4().hex[:8]}"
 
     # 1. Create Product
     create_payload = {
@@ -148,7 +149,7 @@ def test_costing_sheets_lifecycle():
     # Setup test product
     create_prod = client.post(
         "/api/v1/products",
-        json={"name": "QA Costing Test Item", "unit": "Nos"},
+        json={"name": f"QA Costing Test Item {uuid.uuid4().hex[:8]}", "unit": "Nos"},
     )
     assert create_prod.status_code == 201
     prod_id = create_prod.json()["id"]
