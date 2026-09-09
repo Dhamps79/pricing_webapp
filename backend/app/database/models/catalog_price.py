@@ -29,7 +29,7 @@ class CatalogPrice(Base):
 
     import_id: Mapped[int] = mapped_column(
         ForeignKey("catalog_imports.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
 

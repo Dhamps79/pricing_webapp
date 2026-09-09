@@ -1,9 +1,9 @@
 from fastapi import (
     APIRouter,
     Depends,
-    File,
     HTTPException,
     Query,
+    Request,
     UploadFile,
 )
 from sqlalchemy import func, or_, select
@@ -34,7 +34,7 @@ router = APIRouter(
 
 @router.post("/imports/upload")
 async def upload_catalog(
-    file: UploadFile = File(...),
+    request: Request,
     supplier_name: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
@@ -42,17 +42,23 @@ async def upload_catalog(
     Upload a catalog PDF and import its products/prices.
     """
 
-    if not file.filename:
+    form = await request.form()
+    file = form.get("file")
+
+    if not file or not hasattr(file, "filename") or not file.filename:
         raise HTTPException(
             status_code=400,
             detail="A filename is required.",
         )
+
+
 
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are supported.",
         )
+
 
     contents = await file.read()
 
@@ -107,10 +113,11 @@ def search_catalog_items(
     q: str | None = Query(default=None),
     category: str | None = Query(default=None),
     limit: int = Query(
-        default=40,
+        default=50,
         ge=1,
-        le=200,
+        le=2000,
     ),
+
     offset: int = Query(
         default=0,
         ge=0,

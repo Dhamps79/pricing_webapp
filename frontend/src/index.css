@@ -26,35 +26,112 @@ body {
   margin-bottom: 0;
 }
 
-.toolbar {
+/* Search & Filter Toolbar */
+.catalog-toolbar {
   display: flex;
-  gap: 12px;
-  padding: 20px 32px;
+  gap: 10px;
+  padding: 16px 32px;
   background: white;
+  border-bottom: 1px solid #f1f5f9;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.toolbar input {
+.catalog-search-input {
   flex: 1;
-  max-width: 700px;
-  padding: 12px;
-  border: 1px solid #ccc;
+  min-width: 200px;
+  max-width: 500px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #0f172a;
 }
 
-.toolbar button {
-  padding: 12px 20px;
-  border: 0;
+.catalog-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.catalog-category-select {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #0f172a;
+  min-width: 160px;
+}
+
+.catalog-category-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.catalog-search-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s;
 }
 
+.catalog-search-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Summary Cards */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 16px 32px;
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-card span {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.summary-card strong {
+  font-size: 22px;
+  color: #0f172a;
+}
+
+/* Error Banner */
 .error {
   margin: 16px 32px;
   padding: 12px;
   border-radius: 6px;
-  background: #fee;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
+/* Grid Container */
 .grid-container {
-  padding: 0 32px 32px;
+  padding: 0 32px 24px;
 }

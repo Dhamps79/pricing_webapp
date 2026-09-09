@@ -239,3 +239,96 @@ def delete_sheet(db: Session, sheet_id: int) -> bool:
     db.delete(sheet)
     db.commit()
     return True
+
+
+def add_products_batch_to_sheet(
+    db: Session,
+    sheet_id: int,
+    product_ids: list[int],
+    quantity: Decimal = Decimal("1"),
+) -> dict | None:
+    sheet = get_costing_sheet(db, sheet_id)
+    if sheet is None or not product_ids:
+        return None
+
+    prices = latest_catalog_prices_for_products(db, product_ids)
+
+    # Avoid duplicate lines for the same product in this batch
+    existing_product_ids = {line.product_id for line in sheet.lines}
+
+    current_order = len(sheet.lines)
+    for pid in product_ids:
+        if pid in existing_product_ids:
+            continue
+        product = get_product_by_id(db, pid)
+        if not product:
+            continue
+
+        latest = prices.get(product.id)
+        list_price = latest.price if latest else Decimal("0")
+
+        add_costing_line(
+            db=db,
+            sheet=sheet,
+            product=product,
+            quantity=quantity,
+            list_price=list_price,
+            sell_price=list_price,
+            discount_percent=Decimal("0"),
+            unit=product.unit,
+            notes=None,
+            sort_order=current_order,
+        )
+        current_order += 1
+        existing_product_ids.add(pid)
+
+    db.commit()
+    return serialize_sheet(get_costing_sheet(db, sheet_id))
+
+
+def export_sheet_to_csv(sheet_data: dict) -> str:
+    import csv
+    import io
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Sheet Metadata Header
+    writer.writerow(["Quotation / Costing Sheet", sheet_data.get("title", "")])
+    writer.writerow(["Customer", sheet_data.get("customer_name") or "N/A"])
+    writer.writerow(["Overall Discount (%)", sheet_data.get("discount_percent", "0")])
+    writer.writerow(["List Total", sheet_data.get("list_total", "0.00")])
+    writer.writerow(["Net Total", sheet_data.get("net_total", "0.00")])
+    writer.writerow(["Grand Total", sheet_data.get("grand_total", "0.00")])
+    writer.writerow([])
+
+    # Table Header
+    writer.writerow([
+        "#",
+        "Product Code / SKU",
+        "Description",
+        "Category",
+        "Unit",
+        "List Price (INR)",
+        "Quantity",
+        "Sell Price (INR)",
+        "Line Discount (%)",
+        "Line Net Total (INR)",
+    ])
+
+    for idx, line in enumerate(sheet_data.get("lines", []), start=1):
+        writer.writerow([
+            idx,
+            line.get("sku") or "",
+            line.get("name") or "",
+            line.get("category") or "",
+            line.get("unit") or "Each",
+            line.get("list_price") or "0",
+            line.get("quantity") or "1",
+            line.get("sell_price") or "0",
+            line.get("discount_percent") or "0",
+            line.get("line_net_total") or "0",
+        ])
+
+    return output.getvalue()
+

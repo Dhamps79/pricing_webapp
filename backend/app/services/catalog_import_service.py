@@ -17,10 +17,13 @@ from app.database.models.category import Category
 from app.database.models.product import Product
 from app.database.models.product_attribute import ProductAttribute
 from app.database.models.product_code import ProductCode
+from decimal import Decimal
 from app.services.parser.siemens_parser import (
     ParsedCatalogProduct,
     parse_siemens_pdf,
 )
+from app.services.pricelist_parser import parse_pricelist_pdf
+
 
 
 logger = logging.getLogger(__name__)
@@ -467,9 +470,38 @@ def import_siemens_catalog(
     import_record.status = "processing"
 
     try:
-        parsed_products = parse_siemens_pdf(
+        # Strategy 1: Run coordinate-aware table extraction
+        coord_products = parse_siemens_pdf(
             import_record.file_path
         )
+
+
+        # Strategy 2: Run high-yield pattern & line extraction across all document pages
+        pricelist_items = parse_pricelist_pdf(
+            import_record.file_path,
+            source_title=import_record.supplier_name or "Siemens",
+        )
+
+        # Merge results by SKU/product_code to maximize extraction yield and detail
+        product_map: dict[str, ParsedCatalogProduct] = {}
+        for p in coord_products:
+            product_map[p.product_code.upper()] = p
+
+        for item in pricelist_items:
+            sku_key = item.sku.upper()
+            if sku_key not in product_map:
+                product_map[sku_key] = ParsedCatalogProduct(
+                    product_code=item.sku,
+                    description=item.description,
+                    price=Decimal(str(item.list_price)),
+                    unit=item.unit or "Nos",
+                    standard_package=item.unit,
+                    category=item.category or "General",
+                    brand=import_record.supplier_name or "Siemens",
+                    page_number=item.page,
+                )
+
+        parsed_products = list(product_map.values())
 
         import_record.total_rows = (
             len(parsed_products)
@@ -477,6 +509,7 @@ def import_siemens_catalog(
 
         imported_count = 0
         failed_count = 0
+
 
         for index, parsed in enumerate(
             parsed_products,
