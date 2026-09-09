@@ -1,20 +1,24 @@
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.database.sessions import get_db
 from app.services.costing_service import (
     add_product_to_sheet,
+    add_products_batch_to_sheet,
     create_sheet,
     delete_sheet,
+    export_sheet_to_csv,
     get_sheet,
     list_sheets,
     remove_line,
     update_line,
     update_sheet,
 )
+
 
 router = APIRouter(
     prefix="/costing-sheets",
@@ -49,6 +53,12 @@ class CostingLineUpdate(BaseModel):
     sell_price: Decimal | None = None
     discount_percent: Decimal | None = None
     notes: str | None = None
+
+
+class CostingBatchLinesCreate(BaseModel):
+    product_ids: list[int] = Field(min_length=1)
+    quantity: Decimal = Decimal("1")
+
 
 
 @router.get("")
@@ -167,3 +177,42 @@ def delete_line(
     if sheet is None:
         raise HTTPException(status_code=404, detail="Line not found")
     return sheet
+
+
+@router.post("/{sheet_id}/lines/batch")
+def add_lines_batch(
+    sheet_id: int,
+    payload: CostingBatchLinesCreate,
+    db: Session = Depends(get_db),
+):
+    sheet = add_products_batch_to_sheet(
+        db=db,
+        sheet_id=sheet_id,
+        product_ids=payload.product_ids,
+        quantity=payload.quantity,
+    )
+    if sheet is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Costing sheet not found or empty product IDs",
+        )
+    return sheet
+
+
+@router.get("/{sheet_id}/export/csv")
+def export_costing_sheet_csv(
+    sheet_id: int,
+    db: Session = Depends(get_db),
+):
+    sheet = get_sheet(db, sheet_id)
+    if sheet is None:
+        raise HTTPException(status_code=404, detail="Costing sheet not found")
+
+    csv_data = export_sheet_to_csv(sheet)
+    filename = f"costing_sheet_{sheet_id}.csv"
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+

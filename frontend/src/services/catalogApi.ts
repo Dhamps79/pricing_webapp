@@ -158,7 +158,6 @@ export function uploadCatalogPdf(
             percent,
           };
           onProgressCallback?.(progressInfo);
-          legacyOnProgress?.(percent);
         }
       };
 

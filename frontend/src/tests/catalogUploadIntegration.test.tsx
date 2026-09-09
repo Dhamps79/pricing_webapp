@@ -1,13 +1,17 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CatalogUpload } from "../components/CatalogUpload";
 import App from "../App";
 import * as catalogApi from "../services/catalogApi";
 import * as productApi from "../services/productApi";
 
 describe("CatalogUpload Component & App Integration Tests", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -131,7 +135,7 @@ describe("CatalogUpload Component & App Integration Tests", () => {
 
       const uploadSpy = vi
         .spyOn(catalogApi, "uploadCatalogPdf")
-        .mockImplementation((file, options) => {
+        .mockImplementation((_file, options) => {
           if (typeof options === "object") {
             progressCallback = options.onProgress;
           }
@@ -230,7 +234,22 @@ describe("CatalogUpload Component & App Integration Tests", () => {
           {
             id: 1,
             name: "Initial Product",
+            brand_id: null,
+            category_id: null,
+            description: null,
+            unit: null,
             image_url: null,
+            is_active: true,
+            current_price: null,
+            previous_price: null,
+            price_change: null,
+            price_change_percent: null,
+            currency: null,
+            availability: null,
+            source_url: null,
+            source_domain: null,
+            fetched_at: null,
+            trend: "stable" as const,
             created_at: "2026-09-08T07:00:00Z",
             updated_at: "2026-09-08T07:00:00Z",
             prices: [],

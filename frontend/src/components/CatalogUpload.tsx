@@ -239,7 +239,7 @@ export function CatalogUpload({
 
             <div className="catalog-dropzone-text">
               <span className="catalog-dropzone-primary">
-                <strong>Click to browse</strong> or drag & drop supplier catalog PDF
+                <strong>Click to browse or drag & drop supplier catalog PDF</strong>
               </span>
               <span className="catalog-dropzone-secondary">
                 Accepts manufacturer price lists (.pdf) up to 50MB (e.g., Siemens Betagard)

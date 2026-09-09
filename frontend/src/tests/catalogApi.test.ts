@@ -109,7 +109,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       const result = await uploadCatalogPdf(validFile, {
         supplierName: "Siemens",
@@ -124,7 +124,10 @@ describe("catalogApi client unit & integration tests", () => {
       expect(capturedUrl).toContain("/catalog/imports/upload");
       expect(capturedUrl).toContain("supplier_name=Siemens");
       expect(capturedFormData).not.toBeNull();
-      expect(capturedFormData?.get("file")).toBe(validFile);
+      const uploadedFile = (capturedFormData as unknown as FormData).get("file") as File;
+      expect(uploadedFile.name).toBe(validFile.name);
+      expect(uploadedFile.type).toBe(validFile.type);
+      expect(uploadedFile.size).toBe(validFile.size);
     });
 
     it("supports legacy positional arguments (file, supplierName, onProgress)", async () => {
@@ -175,7 +178,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       const result = await uploadCatalogPdf(validFile, "Schneider", (percent) => {
         percentList.push(percent);
@@ -207,7 +210,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       await expect(uploadCatalogPdf(validFile)).rejects.toThrow(
         "Catalog PDF exceeds the maximum allowed size.",
@@ -244,7 +247,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       await expect(uploadCatalogPdf(validFile)).rejects.toThrow("Invalid format");
     });
@@ -269,7 +272,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       await expect(uploadCatalogPdf(validFile)).rejects.toThrow("Network error");
     });
@@ -294,7 +297,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       await expect(uploadCatalogPdf(validFile)).rejects.toThrow("timed out");
     });
@@ -321,7 +324,7 @@ describe("catalogApi client unit & integration tests", () => {
         timeout: 0,
       };
 
-      vi.stubGlobal("XMLHttpRequest", vi.fn(() => fakeXHR));
+      vi.stubGlobal("XMLHttpRequest", function () { return fakeXHR; });
 
       await expect(
         uploadCatalogPdf(validFile, { signal: controller.signal }),
