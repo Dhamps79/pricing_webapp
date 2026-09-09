@@ -7,7 +7,10 @@ class Settings(BaseSettings):
     app_name: str = "Live Spreadsheet"
     environment: str = "development"
 
-    database_url: str
+    # Provide a sensible default so tests and local runs don't fail when
+    # DATABASE_URL is not set in the environment. This default will be
+    # overridden by the DATABASE_URL environment variable when present.
+    database_url: str = "sqlite+aiosqlite:///./test.db"
 
     cors_origins: str = (
         "http://localhost:5173,"
