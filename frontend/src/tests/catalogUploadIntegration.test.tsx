@@ -5,7 +5,7 @@ import { cleanup, render, screen, fireEvent, waitFor } from "@testing-library/re
 import { CatalogUpload } from "../components/CatalogUpload";
 import App from "../App";
 import * as catalogApi from "../services/catalogApi";
-import * as productApi from "../services/productApi";
+
 
 describe("CatalogUpload Component & App Integration Tests", () => {
   afterEach(() => {
@@ -227,36 +227,31 @@ describe("CatalogUpload Component & App Integration Tests", () => {
 
   describe("App.tsx Integration & Auto-Refresh Signaling", () => {
     it("renders CatalogUpload in toolbar and triggers auto-refresh upon successful upload", async () => {
-      let getProductsCallCount = 0;
-      vi.spyOn(productApi, "getProducts").mockImplementation(() => {
-        getProductsCallCount++;
-        return Promise.resolve([
-          {
-            id: 1,
-            name: "Initial Product",
-            brand_id: null,
-            category_id: null,
-            description: null,
-            unit: null,
-            image_url: null,
-            is_active: true,
-            current_price: null,
-            previous_price: null,
-            price_change: null,
-            price_change_percent: null,
-            currency: null,
-            availability: null,
-            source_url: null,
-            source_domain: null,
-            fetched_at: null,
-            trend: "stable" as const,
-            created_at: "2026-09-08T07:00:00Z",
-            updated_at: "2026-09-08T07:00:00Z",
-            prices: [],
-            sources: [],
-          },
-        ]);
+      let getCatalogItemsCallCount = 0;
+      vi.spyOn(catalogApi, "getCatalogItems").mockImplementation(() => {
+        getCatalogItemsCallCount++;
+        return Promise.resolve({
+          total: 1,
+          items: [
+            {
+              id: 1,
+              product_code: "5SL71057RC",
+              name: "Initial Product",
+              description: "Initial description",
+              category: "Switchgear",
+              category_id: 1,
+              unit: "Each",
+              image_url: null,
+              brand_id: 1,
+              price: "100.00",
+              currency: "INR",
+              brand: "Siemens",
+              attributes: {},
+            },
+          ],
+        });
       });
+
 
       const mockUploadResponse = {
         id: 10,
@@ -276,8 +271,9 @@ describe("CatalogUpload Component & App Integration Tests", () => {
 
       // Initial load
       await waitFor(() => {
-        expect(getProductsCallCount).toBe(1);
+        expect(getCatalogItemsCallCount).toBe(1);
       });
+
 
       // Verify CatalogUpload is rendered in App toolbar
       expect(screen.getByTestId("catalog-upload-wrapper")).toBeInTheDocument();
@@ -305,8 +301,9 @@ describe("CatalogUpload Component & App Integration Tests", () => {
       expect(screen.getByText(/Successfully imported 52 products/i)).toBeInTheDocument();
       expect(screen.getByText(/Supplier: Siemens/i)).toBeInTheDocument();
 
-      // Verify declarative auto-refresh counter triggered getProducts again!
-      expect(getProductsCallCount).toBe(2);
+      // Verify declarative auto-refresh counter triggered getCatalogItems again!
+      expect(getCatalogItemsCallCount).toBe(2);
+
 
       // Verify dismissing notification banner works
       fireEvent.click(screen.getByTestId("dismiss-notification-btn"));

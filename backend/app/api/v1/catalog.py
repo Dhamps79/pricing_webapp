@@ -35,7 +35,6 @@ router = APIRouter(
 @router.post("/imports/upload")
 async def upload_catalog(
     request: Request,
-    file: UploadFile,
     supplier_name: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
@@ -46,12 +45,13 @@ async def upload_catalog(
     form = await request.form()
     file = form.get("file")
 
-    if not isinstance(file, UploadFile) or not file.filename:
-    if not file or not file.filename:
+    if not file or not hasattr(file, "filename") or not file.filename:
         raise HTTPException(
             status_code=400,
             detail="A filename is required.",
         )
+
+
 
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
@@ -113,12 +113,11 @@ def search_catalog_items(
     q: str | None = Query(default=None),
     category: str | None = Query(default=None),
     limit: int = Query(
-        default=40,
         default=50,
         ge=1,
-        le=200,
         le=2000,
     ),
+
     offset: int = Query(
         default=0,
         ge=0,

@@ -470,11 +470,11 @@ def import_siemens_catalog(
     import_record.status = "processing"
 
     try:
-        parsed_products = parse_siemens_pdf(
         # Strategy 1: Run coordinate-aware table extraction
         coord_products = parse_siemens_pdf(
             import_record.file_path
         )
+
 
         # Strategy 2: Run high-yield pattern & line extraction across all document pages
         pricelist_items = parse_pricelist_pdf(

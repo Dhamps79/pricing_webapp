@@ -246,6 +246,7 @@ function App() {
       {/* UPLOAD NOTIFICATION BANNER */}
       {uploadNotification && (
         <section
+          data-testid="catalog-notification-banner"
           className={`catalog-notification-banner ${
             uploadNotification.type === "success"
               ? "catalog-notification-banner--success"
@@ -291,6 +292,7 @@ function App() {
           </div>
           <button
             type="button"
+            data-testid="dismiss-notification-btn"
             onClick={() => setUploadNotification(null)}
             style={{
               background: "none",
@@ -308,14 +310,16 @@ function App() {
         </section>
       )}
 
+
       {/* CATALOG PDF UPLOAD */}
-      <section style={{ padding: "0 32px" }}>
+      <section data-testid="catalog-upload-wrapper" style={{ padding: "0 32px" }}>
         <CatalogUpload
           defaultSupplier="Siemens"
           onUploadSuccess={handleCatalogUploadSuccess}
           onUploadError={(err) => setError(err.message)}
         />
       </section>
+
 
       {/* SEARCH & FILTER TOOLBAR */}
       <section className="catalog-toolbar">
