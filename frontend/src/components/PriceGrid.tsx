@@ -8,7 +8,6 @@ interface PriceGridProps {
   onAddToSheet: (item: CatalogRow) => void;
   onDelete: (productId: number) => void;
   onSelectionChanged?: (selectedRows: CatalogRow[]) => void;
-  pageSize?: number;
 }
 
 export default function PriceGrid({
@@ -16,8 +15,8 @@ export default function PriceGrid({
   onAddToSheet,
   onDelete,
   onSelectionChanged,
-  pageSize = 50,
 }: PriceGridProps) {
+
   const columnDefs = useMemo<ColDef<CatalogRow>[]>(
     () => [
       {
@@ -117,7 +116,6 @@ export default function PriceGrid({
                 onClick={() => onAddToSheet(row)}
               >
                 + Add to Sheet
-                + Add
               </button>
 
               <button
@@ -164,10 +162,7 @@ export default function PriceGrid({
         rowData={rows}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
-        pagination={true}
-        paginationPageSize={pageSize}
-        paginationPageSizeSelector={[25, 50, 100, 250, 500]}
-
+        pagination={false}
         animateRows={true}
         rowSelection="multiple"
         suppressRowClickSelection={true}
