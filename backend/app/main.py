@@ -22,27 +22,21 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
 
-app = FastAPI(title="pricing_webapp")  # title will be updated at startup
+settings = get_settings()
 
+app = FastAPI(
+    title=settings.app_name,
+    lifespan=lifespan,
+)
 
-@app.on_event("startup")
-async def _apply_settings_on_startup() -> None:
-    """
-    Delay construction of Settings until startup so importing this module
-    (e.g., during pytest collection) does not require environment variables
-    to be present.
-    """
-    settings = get_settings()
-    app.title = settings.app_name
-
-    # Add CORS middleware using runtime settings
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origin_list,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# Add CORS middleware at instantiation time (Starlette requires middleware before startup)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 app.include_router(
