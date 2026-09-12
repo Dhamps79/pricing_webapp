@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     environment: str = "development"
 
     database_url: str
+    database_url: str = "sqlite:///./live_spreadsheet.db"
 
     cors_origins: str = (
         "http://localhost:5173,"

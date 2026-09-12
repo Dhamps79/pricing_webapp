@@ -571,6 +571,7 @@ function App() {
             onAddToSheet={handleAddToSheet}
             onDelete={handleDelete}
             onSelectionChanged={setSelectedRows}
+            pageSize={pageSize}
           />
 
         )}
