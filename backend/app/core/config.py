@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Provide a sensible default so tests and local runs don't fail when
     # DATABASE_URL is not set in the environment. This default will be
     # overridden by the DATABASE_URL environment variable when present.
-    database_url: str = "sqlite+aiosqlite:///./test.db"
+    database_url: str = "sqlite:///./live_spreadsheet.db"
 
     cors_origins: str = (
         "http://localhost:5173,"
