@@ -437,7 +437,7 @@ function App() {
               disabled={batchActionLoading}
               onClick={handleBatchAddToSheet}
               style={{
-                background: "#2563eb",
+                background: "#2266dc",
                 color: "#fff",
                 border: "none",
                 borderRadius: "6px",
@@ -573,6 +573,7 @@ function App() {
             onSelectionChanged={setSelectedRows}
             pageSize={pageSize}
           />
+
         )}
       </section>
 
