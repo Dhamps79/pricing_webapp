@@ -38,6 +38,7 @@ class ProductCode(Base):
 
     code_type: Mapped[str] = mapped_column(
         String(50),
+        default="manufacturer",
         nullable=False,
         index=True,
     )

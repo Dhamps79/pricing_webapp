@@ -126,14 +126,14 @@ def test_b3_minimum_limit_boundary_1(client: TestClient):
 
 
 def test_b3_maximum_limit_boundary_200(client: TestClient):
-    """B3.3: Maximum limit query parameter (limit=200) executes successfully."""
-    res = client.get("/api/v1/catalog/items?limit=200")
+    """B3.3: Maximum limit query parameter (limit=2000) executes successfully."""
+    res = client.get("/api/v1/catalog/items?limit=2000")
     assert res.status_code == 200
 
 
 def test_b3_limit_exceeding_maximum_returns_422(client: TestClient):
-    """B3.4: Limit parameter exceeding 200 returns 422 validation error."""
-    res = client.get("/api/v1/catalog/items?limit=201")
+    """B3.4: Limit parameter exceeding 2000 returns 422 validation error."""
+    res = client.get("/api/v1/catalog/items?limit=2001")
     assert res.status_code == 422
 
 

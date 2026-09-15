@@ -9,6 +9,8 @@ from app.database.models.category import Category
 from app.database.models.product import Product
 from app.database.models.product_code import ProductCode
 from app.database.models.catalog_price import CatalogPrice
+from app.tests.e2e.conftest import get_or_create_test_product
+
 
 
 # ===========================================================================
@@ -27,18 +29,23 @@ def test_tier4_residential_distribution_board_quote(
     - Sheet Discount: 3.5% contractor commission
     """
     # Create required products in DB
-    p2 = Product(name="5SL72167RC", description="2P 5SL7 10kA C-Curve MCB 16A", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p2)
-    db.flush()
-    db.add(ProductCode(product_id=p2.id, code="5SL72167RC", is_primary=True))
-    db.add(CatalogPrice(product_id=p2.id, price=Decimal("2280.00"), currency="INR"))
-
-    p3 = Product(name="5SL71167RC", description="1P 5SL7 10kA C-Curve MCB 16A", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p3)
-    db.flush()
-    db.add(ProductCode(product_id=p3.id, code="5SL71167RC", is_primary=True))
-    db.add(CatalogPrice(product_id=p3.id, price=Decimal("925.00"), currency="INR"))
-    db.commit()
+    from app.tests.e2e.conftest import get_or_create_test_product
+    p2 = get_or_create_test_product(
+        db,
+        code="5SL72167RC",
+        price=Decimal("2280.00"),
+        description="2P 5SL7 10kA C-Curve MCB 16A",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
+    p3 = get_or_create_test_product(
+        db,
+        code="5SL71167RC",
+        price=Decimal("925.00"),
+        description="1P 5SL7 10kA C-Curve MCB 16A",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
 
     # Create quotation sheet
     sheet = client.post(
@@ -94,18 +101,22 @@ def test_tier4_commercial_three_phase_quote(
     - 24 x 1P MCB (5SL71057RC @ ₹925.00, 20% discount)
     - Sheet Discount: 5.0%
     """
-    p_4p = Product(name="5SL74637RC", description="4P 5SL7 10kA C-Curve MCB 63A", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p_4p)
-    db.flush()
-    db.add(ProductCode(product_id=p_4p.id, code="5SL74637RC", is_primary=True))
-    db.add(CatalogPrice(product_id=p_4p.id, price=Decimal("5120.00"), currency="INR"))
-
-    p_3p = Product(name="5SL73327RC", description="3P 5SL7 10kA C-Curve MCB 32A", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p_3p)
-    db.flush()
-    db.add(ProductCode(product_id=p_3p.id, code="5SL73327RC", is_primary=True))
-    db.add(CatalogPrice(product_id=p_3p.id, price=Decimal("3840.00"), currency="INR"))
-    db.commit()
+    p_4p = get_or_create_test_product(
+        db,
+        code="5SL74637RC",
+        price=Decimal("5120.00"),
+        description="4P 5SL7 10kA C-Curve MCB 63A",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
+    p_3p = get_or_create_test_product(
+        db,
+        code="5SL73327RC",
+        price=Decimal("3840.00"),
+        description="3P 5SL7 10kA C-Curve MCB 32A",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
 
     sheet = client.post(
         "/api/v1/costing-sheets",
@@ -149,18 +160,22 @@ def test_tier4_government_tender_zero_discount_quote(
     - 4 x Siemens MCBs (5SL71057RC @ ₹925.00)
     - Verification that List Total, Net Total, and Grand Total are exactly equal.
     """
-    p_starter = Product(name="3TW7291-1A", description="DOL Starter 10HP", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p_starter)
-    db.flush()
-    db.add(ProductCode(product_id=p_starter.id, code="3TW7291-1A", is_primary=True))
-    db.add(CatalogPrice(product_id=p_starter.id, price=Decimal("3450.00"), currency="INR"))
-
-    p_relay = Product(name="3UW5102-0J", description="Overload Relay 16A", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(p_relay)
-    db.flush()
-    db.add(ProductCode(product_id=p_relay.id, code="3UW5102-0J", is_primary=True))
-    db.add(CatalogPrice(product_id=p_relay.id, price=Decimal("1850.00"), currency="INR"))
-    db.commit()
+    p_starter = get_or_create_test_product(
+        db,
+        code="3TW7291-1A",
+        price=Decimal("3450.00"),
+        description="DOL Starter 10HP",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
+    p_relay = get_or_create_test_product(
+        db,
+        code="3UW5102-0J",
+        price=Decimal("1850.00"),
+        description="Overload Relay 16A",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
 
     sheet = client.post(
         "/api/v1/costing-sheets",

@@ -141,3 +141,58 @@ def siemens_5sl71057rc_product(db: Session, test_brand: Brand, test_category: Ca
     db.commit()
     db.refresh(prod)
     return prod
+
+
+def get_or_create_test_product(
+    db: Session,
+    code: str,
+    price: Decimal,
+    description: str,
+    brand_id: int,
+    category_id: int,
+    unit: str = "1 NO",
+) -> Product:
+    """Helper to safely find or create a product with code and catalog price in tests."""
+    existing_code = db.query(ProductCode).filter(ProductCode.code == code).first()
+    if existing_code and existing_code.product:
+        prod = existing_code.product
+    else:
+        prod = Product(
+            name=code,
+            description=description,
+            unit=unit,
+            brand_id=brand_id,
+            category_id=category_id,
+            is_active=True,
+        )
+        db.add(prod)
+        db.flush()
+
+        prod_code = ProductCode(
+            product_id=prod.id,
+            code=code,
+            is_primary=True,
+            code_type="manufacturer",
+        )
+        db.add(prod_code)
+
+    price_rec = (
+        db.query(CatalogPrice)
+        .filter(CatalogPrice.product_id == prod.id)
+        .order_by(CatalogPrice.created_at.desc())
+        .first()
+    )
+    if not price_rec or price_rec.price != price:
+        price_rec = CatalogPrice(
+            product_id=prod.id,
+            price=price,
+            currency="INR",
+            unit=unit,
+            standard_package="1",
+        )
+        db.add(price_rec)
+
+    db.commit()
+    db.refresh(prod)
+    return prod
+
