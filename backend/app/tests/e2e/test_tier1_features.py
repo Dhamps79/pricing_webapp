@@ -444,12 +444,15 @@ def test_f8_single_line_with_discount_math(client: TestClient, siemens_5sl71057r
 
 def test_f8_multi_line_sheet_list_total(client: TestClient, siemens_5sl71057rc_product, db: Session, test_brand, test_category):
     """F8.3: Verify sheet_list_total is exact sum of line_list_totals."""
-    prod2 = Product(name="5SL72167RC", description="2P MCB", unit="1 NO", brand_id=test_brand.id, category_id=test_category.id, is_active=True)
-    db.add(prod2)
-    db.flush()
-    db.add(ProductCode(product_id=prod2.id, code="5SL72167RC", is_primary=True))
-    db.add(CatalogPrice(product_id=prod2.id, price=Decimal("2280.00"), currency="INR"))
-    db.commit()
+    from app.tests.e2e.conftest import get_or_create_test_product
+    prod2 = get_or_create_test_product(
+        db,
+        code="5SL72167RC",
+        price=Decimal("2280.00"),
+        description="2P MCB",
+        brand_id=test_brand.id,
+        category_id=test_category.id,
+    )
 
     sheet_id = client.post("/api/v1/costing-sheets", json={"title": "Multi-Line Sum"}).json()["id"]
     client.post(f"/api/v1/costing-sheets/{sheet_id}/lines", json={"product_id": siemens_5sl71057rc_product.id, "quantity": 2.0}) # 2*925 = 1850
