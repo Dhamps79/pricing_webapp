@@ -290,10 +290,11 @@ def test_tier3_search_pagination_add_to_quote_loop(
     """
     # Create extra catalog products
     for idx in range(3):
-        p = Product(name=f"LOOP_MCB_{idx}_{uuid.uuid4().hex[:4]}", is_active=True, brand_id=test_brand.id, category_id=test_category.id)
+        unique_suffix = uuid.uuid4().hex
+        p = Product(name=f"LOOP_MCB_{idx}_{unique_suffix}", is_active=True, brand_id=test_brand.id, category_id=test_category.id)
         db.add(p)
         db.flush()
-        db.add(ProductCode(product_id=p.id, code=p.name, is_primary=True))
+        db.add(ProductCode(product_id=p.id, code=f"CODE_{idx}_{unique_suffix}", is_primary=True))
         db.add(CatalogPrice(product_id=p.id, price=Decimal(f"{(idx+1)*500}.00"), currency="INR"))
     db.commit()
 

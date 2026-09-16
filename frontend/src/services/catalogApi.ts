@@ -115,10 +115,13 @@ export function uploadCatalogPdf(
 
     const xhr = new XMLHttpRequest();
     const endpoint = `${API_BASE_URL}/catalog/imports/upload`;
-    const url = new URL(
-      endpoint,
-      typeof window !== "undefined" ? window.location.origin : "http://localhost:8000",
-    );
+    const defaultOrigin =
+      typeof window !== "undefined" && window.location?.origin && window.location.origin !== "null"
+        ? window.location.origin
+        : "http://localhost:8000";
+    const url = endpoint.startsWith("http://") || endpoint.startsWith("https://")
+      ? new URL(endpoint)
+      : new URL(endpoint, defaultOrigin);
     if (supplierName) {
       url.searchParams.set("supplier_name", supplierName);
     }
