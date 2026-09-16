@@ -1,0 +1,48 @@
+========================================================================
+             LIVE SPREADSHEET - OFFLINE LOCAL APPLICATION
+========================================================================
+
+Thank you for downloading Live Spreadsheet!
+This package is configured to run 100% locally on your PC without needing
+an internet connection or any cloud services.
+
+------------------------------------------------------------------------
+HOW TO RUN ON WINDOWS (EASIEST):
+------------------------------------------------------------------------
+1. Double-click "run_app.bat" in this folder.
+2. The application will start immediately and automatically open in your
+   default web browser at:
+   http://localhost:8000
+3. That's it! You can now:
+   - Upload PDF pricelists (e.g. Siemens Betagard).
+   - Search products, SKUs, descriptions, and list prices.
+   - Build custom Costing Sheets and Quotations with real-time discounts.
+   - Export quotations and calculate accurate net totals.
+
+To stop the application at any time, close the command window or press
+Ctrl+C inside it.
+
+------------------------------------------------------------------------
+HOW TO RUN ON MAC / LINUX:
+------------------------------------------------------------------------
+1. Open a terminal in this folder.
+2. Run:
+   python run_local.py
+3. Your browser will automatically open to http://localhost:8000.
+
+------------------------------------------------------------------------
+DATA STORAGE & PRIVACY:
+------------------------------------------------------------------------
+- All your uploaded PDFs, catalogs, products, and costing sheets are stored
+  strictly on your own computer in an embedded SQLite database file
+  ("live_spreadsheet.db").
+- No data is sent over the internet or shared with external servers.
+- This download starts completely clean with zero prior records.
+
+------------------------------------------------------------------------
+TROUBLESHOOTING:
+------------------------------------------------------------------------
+- If Python is not installed on the PC, download and install it from
+  https://www.python.org/ (ensure "Add Python to PATH" is checked).
+- Then double-click "setup_offline_env.bat" once, followed by "run_app.bat".
+========================================================================
