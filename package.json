@@ -1,4 +1,9 @@
 {
+  "name": "live-spreadsheet",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build"
+  },
   "devDependencies": {
     "supabase": "^2.118.0-beta.48"
   }
