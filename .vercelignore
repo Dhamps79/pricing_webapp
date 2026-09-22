@@ -1,0 +1,31 @@
+# Ignore test catalogs and uploads
+backend/storage/
+storage/
+*.pdf
+
+# Ignore node_modules
+node_modules/
+frontend/node_modules/
+
+# Ignore python caches and environments
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.webapp/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Ignore databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore zip files
+*.zip
+
+# Ignore tests & docs in serverless bundle
+backend/app/tests/
+backend/tests/
+tests/

@@ -25,9 +25,12 @@ dist/
 dist-ssr/
 
 # Storage & uploads
-backend/storage/catalog/
-backend/storage/catalogs/
+backend/storage/
 storage/
+*.pdf
+
+# Vercel
+.vercel/
 
 # IDE
 .vscode/
